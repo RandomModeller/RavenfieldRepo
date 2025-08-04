@@ -88,7 +88,7 @@ function fireMode:onFire()
         --self.muzzleAudio.enabled = false
     end
 
-    if self.firstUseSemi and self.shotsFired == 2 then
+    if self.firstUseSemi and self:hitCap() ~= 1 and self.shotsFired == 2 then
         self:UpdateAudio(self.suppressed)
     end
 end
@@ -98,13 +98,13 @@ function fireMode:onMouseUp()
     self.thisScriptLock = false
     self.shotsFired = 0
 
-    if self.firstUseSemi then
+    if self.firstUseSemi and self:hitCap() ~= 1 then
         if self.suppressed then
             self.muzzleAudio.clip = self.firemodeSingleS
         else
             self.muzzleAudio.clip = self.firemodeSingle
         end
-        
+
         self.muzzleAudio.loop = false
     end
 end
