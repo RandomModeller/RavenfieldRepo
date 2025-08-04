@@ -49,6 +49,18 @@ function fireMode:Start()
         self.nonAutoLoopAudio = self.dataContainer.GetBool("FIREMODE_NON_AUTO_LOOP_AUDIO")
     end
 
+    self.firstUseSemi = false
+    if self.dataContainer.HasBool("FIREMODE_FIRST_USE_SINGLE_AUDIO") then
+        self.firstUseSemi = self.dataContainer.GetBool("FIREMODE_FIRST_USE_SINGLE_AUDIO")
+    end
+
+    self.playSoundBank = false
+    if self.targets.soundBank ~= nil then then
+        self.playSoundBank = true
+        self.soundBank = self.targets.soundBank.GetComponent(SoundBank)
+        self.soundBankIndex = self.dataContainer.GetInt("FIREMODE_SOUNDBANKINDEX")
+    end
+
     self.autoResetting = self.dataContainer.GetBool("FIREMODE_AUTORESETTING")
 
     self.suppressed = self.dataContainer.GetBool("FIREMODE_SUPPRESSED")
@@ -75,21 +87,44 @@ function fireMode:onFire()
         self.thisScriptLock = true
         --self.muzzleAudio.enabled = false
     end
+
+    if self.firstUseSemi and self.shotsFired == 2 then
+        self:UpdateAudio(self.suppressed)
+    end
+end
+
+function fireMode:onMouseUp()
+    self.wpn.UnlockWeapon()
+    self.thisScriptLock = false
+    self.shotsFired = 0
+
+    if self.firstUseSemi then
+        if self.suppressed then
+            self.muzzleAudio.clip = self.firemodeSingleS
+        else
+            self.muzzleAudio.clip = self.firemodeSingle
+        end
+        
+        self.muzzleAudio.loop = false
+    end
 end
 
 function fireMode:UpdateAudio(isSuppressed)
     self.suppressed = isSuppressed
+
     if self:hitCap() ~= 1 then
-        self.muzzleAudio.clip = self.firemodeAuto
         if self.suppressed then
             self.muzzleAudio.clip = self.firemodeAutoS
+        else
+            self.muzzleAudio.clip = self.firemodeAuto
         end
         self.wpn.isAuto = true
         self.muzzleAudio.loop = (self:hitCap() == -1 or self.nonAutoLoopAudio)
     else
-        self.muzzleAudio.clip = self.firemodeSingle
         if self.suppressed then
             self.muzzleAudio.clip = self.firemodeSingleS
+        else
+            self.muzzleAudio.clip = self.firemodeSingle
         end
         self.wpn.isAuto = false
         self.muzzleAudio.loop = false
@@ -98,7 +133,6 @@ end
 
 function fireMode:changeFireMode()
     modeIndex = modeIndex + 1
-    --print(tonumber(self.selectorValues[(modeIndex % #self.availableModes) + 1]))
     self.currentCache = (modeIndex % #self.availableModes) + 1
     self.animator.SetInteger("FIREMODE_SELECTORVALUES", tonumber(self.selectorValues[self.currentCache]))
     if self.useTrigger then
@@ -106,6 +140,9 @@ function fireMode:changeFireMode()
     end
     if self.changeCooldown then
         self.wpn.cooldown = self.cooldowns[self.currentCache]
+    end
+    if self.playSoundBank then
+        self.soundBank.PlaySoundBank(self.soundBankIndex)
     end
 
     self:UpdateAudio(self.suppressed)
@@ -142,17 +179,12 @@ function fireMode:Update()
     end
 
     if not Input.GetKeyBindButton(KeyBinds.Fire) and flag and not self.waitUnlock then
-        self.wpn.UnlockWeapon()
-        self.thisScriptLock = false
-        self.shotsFired = 0
+        self:onMouseUp()
     end
 
     if Input.GetKeyDown(self.keybind) then
         self:changeFireMode()
     end
-
-    --if self.updateParam then
-    --end
 end
 
 function fireMode:Split(s, delimiter)
