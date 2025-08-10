@@ -55,7 +55,7 @@ function fireMode:Start()
     end
 
     self.playSoundBank = false
-    if self.targets.soundBank ~= nil then then
+    if self.targets.soundBank ~= nil then
         self.playSoundBank = true
         self.soundBank = self.targets.soundBank.GetComponent(SoundBank)
         self.soundBankIndex = self.dataContainer.GetInt("FIREMODE_SOUNDBANKINDEX")
@@ -206,3 +206,4 @@ function fireMode:Zip(keyArray, valueArray)
     end
     return result
 end
+
