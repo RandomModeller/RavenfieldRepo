@@ -1,4 +1,4 @@
-behaviour("FalconRWRBlip")
+behaviour("FalconRWRBlip") -- v1.0.0
 
 function FalconRWRBlip:Init()
     self.rectTransform = self.gameObject.GetComponent(RectTransform)
@@ -66,4 +66,5 @@ function FalconRWRBlip:Update()
 
         self:Circle(show)
     end
+
 end
