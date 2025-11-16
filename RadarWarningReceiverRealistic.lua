@@ -1,4 +1,4 @@
-behaviour("RadarWarningReceiverRealistic")
+behaviour("RadarWarningReceiverRealistic") --v1.0.0
 
 function RadarWarningReceiverRealistic:Start()
     self.vehicleObject = self.targets.vehicleObject.GetComponent(Vehicle)
@@ -308,4 +308,5 @@ function RadarWarningReceiverRealistic:GetBlipPosition(pos, selfPos)
     delta.Normalize()
 
     return Vector2(delta.x, delta.z)
+
 end
