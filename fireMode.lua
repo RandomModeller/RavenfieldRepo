@@ -1,4 +1,4 @@
-behaviour("fireMode")
+behaviour("fireMode") -- v3.0.0
 
 function fireMode:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -21,7 +21,7 @@ function fireMode:Start()
     self.firemodeSingle = self.dataContainer.HasAudioClip("FIREMODE_SINGLE") and self.dataContainer.GetAudioClip("FIREMODE_SINGLE") or nil
     self.firemodeAutoS = self.dataContainer.HasAudioClip("FIREMODE_AUTO_S") and self.dataContainer.GetAudioClip("FIREMODE_AUTO_S") or nil
     self.firemodeSingleS = self.dataContainer.HasAudioClip("FIREMODE_SINGLE_S") and self.dataContainer.GetAudioClip("FIREMODE_SINGLE_S") or nil
-    if self.dataContainer.GetString("FIREMODE_SELECTORVALUES") ~= nil then
+    if self.dataContainer.HasString("FIREMODE_SELECTORVALUES") then
         self.selectorValues = self:Split(self.dataContainer.GetString("FIREMODE_SELECTORVALUES"), " ")
     end
 
@@ -63,15 +63,25 @@ function fireMode:Start()
 
     self.autoResetting = self.dataContainer.GetBool("FIREMODE_AUTORESETTING")
 
-    self.suppressed = self.dataContainer.GetBool("FIREMODE_SUPPRESSED")
-    self.forceSemi = self.dataContainer.GetBool("FIREMODE_FORCE_SEMI")
+    self.suppressed = false
+    if self.dataContainer.HasBool("FIREMODE_SUPPRESSED") then
+        self.suppressed = self.dataContainer.GetBool("FIREMODE_SUPPRESSED")
+    end
 
-    self.animator.SetInteger("FIREMODE_SELECTORVALUES", tonumber(self.selectorValues[(modeIndex % #self.availableModes) + 1]))
+    self.forceSemi = false
+    if self.dataContainer.HasBool("FIREMODE_FORCE_SEMI") then
+        self.forceSemi = self.dataContainer.GetBool("FIREMODE_FORCE_SEMI")
+    end
+
+    if self.selectorValues ~= nil then
+        self.animator.SetInteger("FIREMODE_SELECTORVALUES", tonumber(self.selectorValues[(modeIndex % #self.availableModes) + 1]))
+    end
 
     -- load keybind
+    self.keybind = "="
     if self.dataContainer.HasString("FIREMODE_KEYBIND") then
         self.keybind = self.dataContainer.GetString("FIREMODE_KEYBIND")
-    else
+    elseif self.dataContainer.HasString("keybind") then
         self.keybind = self.dataContainer.GetString("keybind")
     end
 
@@ -134,7 +144,11 @@ end
 function fireMode:changeFireMode()
     modeIndex = modeIndex + 1
     self.currentCache = (modeIndex % #self.availableModes) + 1
-    self.animator.SetInteger("FIREMODE_SELECTORVALUES", tonumber(self.selectorValues[self.currentCache]))
+
+    if self.selectorValues ~= nil then
+        self.animator.SetInteger("FIREMODE_SELECTORVALUES", tonumber(self.selectorValues[self.currentCache]))
+    end
+
     if self.useTrigger then
         self.animator.SetTrigger("FIREMODE_CHANGE")
     end
@@ -163,7 +177,9 @@ function fireMode:OnEnable()
         return
     end
 
-    self.animator.SetInteger("FIREMODE_SELECTORVALUES", tonumber(self.selectorValues[self.currentCache]))
+    if self.selectorValues ~= nil then
+        self.animator.SetInteger("FIREMODE_SELECTORVALUES", tonumber(self.selectorValues[self.currentCache]))
+    end
 end
 
 function fireMode:Update()
@@ -206,4 +222,3 @@ function fireMode:Zip(keyArray, valueArray)
     end
     return result
 end
-
