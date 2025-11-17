@@ -1,4 +1,4 @@
-behaviour("APS")
+behaviour("APS") --v1.0.0
 
 function APS:Start()
     self.vehicle = self.targets.vehicleObject.GetComponent(Vehicle)
@@ -170,3 +170,4 @@ function APS:Update()
         end
     end
 end
+
