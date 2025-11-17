@@ -1,4 +1,4 @@
-behaviour("HomingWeapon") --v1.0.0
+behaviour("HomingWeapon") --v1.1.0
 
 function HomingWeapon:start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -12,7 +12,9 @@ function HomingWeapon:start()
     self.wpn = self.targets.weapon.GetComponent(Weapon)
     self.wpn.onSpawnProjectiles.AddListener(self, "OnFire")
 
-    self.targetDesignatorBox = self.targets.targetDesignatorBox.GetComponent(RectTransform)
+    if self.targets.targetDesignatorBox ~= nil then
+        self.targetDesignatorBox = self.targets.targetDesignatorBox.GetComponent(RectTransform)
+    end
     self.refreshDelay = self.dataContainer.GetFloat("delay")
     self.next = Time.time + self.refreshDelay
     self.outOfBoundsPos = Vector2(9999, 9999)
@@ -51,9 +53,13 @@ function HomingWeapon:Update()
         if foundActor then
             local position = PlayerCamera.fpCamera.WorldToScreenPoint(actorPosition)
 
-            self.targetDesignatorBox.position = position
+            if self.targets.targetDesignatorBox ~= nil then
+                self.targetDesignatorBox.position = position
+            end
         else
-            self.targetDesignatorBox.anchoredPosition = self.outOfBoundsPos
+            if self.targets.targetDesignatorBox ~= nil then
+                self.targetDesignatorBox.anchoredPosition = self.outOfBoundsPos
+            end
         end
 
         self.next = self.next + self.refreshDelay
@@ -90,4 +96,3 @@ function HomingWeapon:OnFire(projectiles)
         end
     end
 end
-
