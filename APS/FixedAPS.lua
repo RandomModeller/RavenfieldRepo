@@ -1,4 +1,4 @@
-behaviour("FixedAPS")
+behaviour("FixedAPS") --v1.0.0
 
 function FixedAPS:Start()
     self.vehicle = self.targets.vehicleObject.GetComponent(Vehicle)
@@ -204,3 +204,4 @@ function FixedAPS:Update()
         end
     end
 end
+
