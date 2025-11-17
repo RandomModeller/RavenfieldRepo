@@ -1,4 +1,4 @@
-behaviour("HomingBullet")
+behaviour("HomingBullet") --v1.0.0
 
 --function HomingBullet:Start()
 --    self.projectile = self.gameObject.GetComponent(Projectile)
@@ -10,4 +10,5 @@ function HomingBullet:Update()
     end
 
     self.projectile.velocity = Vector3.RotateTowards(self.projectile.velocity, self.target.centerPosition - self.transform.position, self.aimSpeed * Time.deltaTime, 0)
+
 end
