@@ -1,4 +1,4 @@
-behaviour("SecondaryReload")
+behaviour("SecondaryReload") --v1.0.0
 
 function SecondaryReload:Start()
     self.weapon = self.targets.weaponObject.GetComponent(Weapon)
@@ -64,4 +64,5 @@ function SecondaryReload:SecondaryReload()
     self.targetAnimator.SetBool(self.name, false)
     self.weapon:UnlockWeapon()
     self.secondaryMagCapacity = self.secondaryMagMaxCapacity
+
 end
