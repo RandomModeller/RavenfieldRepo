@@ -1,4 +1,4 @@
-behaviour("ShotgunSMGNew")
+behaviour("ShotgunSMGNew") --v1.0.0
 
 function ShotgunSMGNew:Start()
     self.shotgun = self.targets.shotgun.GetComponent(Weapon)
@@ -42,4 +42,5 @@ end
 function ShotgunSMGNew:UpdateAmmo()
     self.smg.ammo = Mathf.Max(self.ammo, 0)
     self.shotgun.ammo = Mathf.Max(self.ammo, 0)
+
 end
