@@ -1,4 +1,4 @@
-behaviour("HomingWeapon")
+behaviour("HomingWeapon") --v1.0.0
 
 function HomingWeapon:start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -90,3 +90,4 @@ function HomingWeapon:OnFire(projectiles)
         end
     end
 end
+
