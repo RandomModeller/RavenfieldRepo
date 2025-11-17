@@ -1,4 +1,4 @@
-behaviour("FixedAPSAmmo")
+behaviour("FixedAPSAmmo") --v1.0.0
 
 function FixedAPSAmmo:Start()
     self.vehicle = self.targets.vehicleObject.GetComponent(Vehicle)
@@ -237,4 +237,5 @@ end
 
 function FixedAPSAmmo:PlayEffect(j)
         self.apsParticle[j].Play(true)
+
 end
