@@ -1,4 +1,4 @@
-behaviour("HideOccupant")
+behaviour("HideOccupant") --v1.0.0
 
 function HideOccupant:Start()
     self.seat = self.targets.seat.GetComponent(Seat)
@@ -42,4 +42,5 @@ function HideOccupant:Update()
     if self.isPlayer then
         Player.SetFirstPersonRenderMode()
     end
+
 end
