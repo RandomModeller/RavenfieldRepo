@@ -1,4 +1,4 @@
-behaviour("SAMRadar") --v1.0.0
+behaviour("SAMRadar") --v1.0.1
 
 function SAMRadar:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -18,8 +18,6 @@ function SAMRadar:Start()
     -- self.outOfBounds = Vector2(5000, 5000)
 
     self.transform = self.gameObject.transform
-
-    --self.iconParent.localEulerAngles = Vector3(0, 0, self.transform.localEulerAngles.y)
 
     self.rotationSpeed = self.dataContainer.GetFloat("rotationSpeed")
     self.doubleDirection = self.dataContainer.GetBool("doubleDirection")
@@ -379,31 +377,6 @@ function SAMRadar:Update()
         pos.y = Mathf.Clamp(pos.y, -self.blipPositionMultiplier, self.blipPositionMultiplier)
         self.cursor.anchoredPosition = pos
 
-        -- if Input.GetKeyDown(KeyCode.Backslash) then
-        --     if self.lockedVehicle then
-        --         self.lockedVehicle = nil
-        --     else
-        --         local cursor = self.transform.position + Vector3(self.cursor.anchoredPosition.x, 0, self.cursor.anchoredPosition.y) * self.range / self.blipPositionMultiplier
-
-        --         for i, vehicle in pairs(ActorManager.vehicles) do
-        --             local delta = vehicle.transform.position - cursor
-
-        --             delta.y = 0
-
-        --             if delta.sqrMagnitude <= 7000 then
-        --                 self.lockedVehicle = vehicle
-
-        --                 for i, blip in pairs(self.blips) do
-        --                     blip.available = true
-        --                     self:DisableDot(i)
-        --                 end
-
-        --                 self:EnableDot(1)
-        --             end
-        --         end
-        --     end
-        -- end
-
         if Input.GetKeyDown(self.lockKey) or (GameManager.isTestingContentMod and Input.GetKeyDown("\\")) then
             if self.lockedVehicle then
                 self.lockedVehicle = nil
@@ -443,10 +416,6 @@ function SAMRadar:GetBlipPosition(pos, selfPos)
 end
 
 function SAMRadar:IsInArea(grad1, grad2, x, y)
-    -- local flag1 = y <= grad1 * x
-    -- local flag2 = y >= grad2 * x
-
-    -- return flag1 and flag2
     return (y/x > grad1 and y/x < grad2) or (y/x < grad1 and y/x > grad2)
 end
 
