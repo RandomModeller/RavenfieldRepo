@@ -1,9 +1,6 @@
-behaviour("SAMFaceTarget")
+behaviour("SAMFaceTarget") --v1.0.0
 
 function SAMFaceTarget:Start()
-    -- if self.targets.radar then
-    --     self.radar = self.targets.radar.GetComponent(ScriptedBehaviour).self
-    -- end
     self.bearing = self.targets.bearing.transform
     self.pitch = self.targets.pitch.transform
     self.target = self.targets.target.transform
@@ -19,15 +16,6 @@ end
 
 function SAMFaceTarget:Update()
     local pos = self.target.position
-
-    -- if self.radar then
-    --     if self.radar.lockedVehicle then
-    --         pos = self.radar.lockedVehicle.transform.position
-    --     else
-    --         return
-    --     end
-    -- end
-
 
     local bearingVector = self.bearing.InverseTransformPoint(pos)
     bearingVector.y = 0
