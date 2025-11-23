@@ -1,4 +1,4 @@
-behaviour("SAMRadar2D") --v1.0.0
+behaviour("SAMRadar2D") --v1.0.1
 
 function SAMRadar2D:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -19,8 +19,10 @@ function SAMRadar2D:Start()
     self.azimuthMult = 1 / Mathf.Tan(Mathf.Deg2Rad * self.dataContainer.GetFloat("scanAngle"))
 
     self.usePositionTick = self.dataContainer.GetBool("usePositionTick")
-    self.positionTick = self.dataContainer.GetFloat("positionTick")
-    
+    if self.usePositionTick then
+        self.positionTick = self.dataContainer.GetFloat("positionTick")
+    end
+        
     self.transform = self.gameObject.transform
 end
 
@@ -118,10 +120,6 @@ end
 
 function SAMRadar2D:VectorAngleSmaller(a, b, cos)
     -- a magnitude has to be 1
-
-    --return Vector3.Angle(a, b) < Mathf.Acos(cos) * Mathf.Rad2Deg
-
-    --return cos > Vector3.Dot(a, b) / b.magnitude
 
     local dot = Vector3.Dot(a, b)
 
