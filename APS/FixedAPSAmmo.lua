@@ -1,4 +1,4 @@
-behaviour("FixedAPSAmmo") --v1.1.0
+behaviour("FixedAPSAmmo") --v1.1.1
 
 function FixedAPSAmmo:Start()
     self.vehicle = self.targets.vehicleObject.GetComponent(Vehicle)
@@ -6,7 +6,7 @@ function FixedAPSAmmo:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
 
     --self.blocked = {"repair (autorepairvehicleweapon)", "apfsds (mountedstabilizedturret)", "apcbc (mountedstabilizedturret)", "apcr (mountedstabilizedturret)", "apds (mountedstabilizedturret)", "apfsds (mountedweapon)", "apcbc (mountedweapon)", "apcr (mountedweapon)", "apds (mountedweapon)"}
-    self.blocked = {"autorepairvehicleweapon", "apfsds", "apcbc", "apcr", "apds", "carhorn"}
+    self.blocked = {"apfsds", "apcbc", "apcr", "apds"}
     self.teams = {}
     self.teams[-1] = Team.Neutral
     self.teams[0] = Team.Blue
