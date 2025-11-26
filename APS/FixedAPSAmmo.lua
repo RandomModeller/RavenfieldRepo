@@ -1,4 +1,4 @@
-behaviour("FixedAPSAmmo") --v1.0.0
+behaviour("FixedAPSAmmo") --v1.1.0
 
 function FixedAPSAmmo:Start()
     self.vehicle = self.targets.vehicleObject.GetComponent(Vehicle)
@@ -98,13 +98,21 @@ function FixedAPSAmmo:LoadAPS()
         self.accelComponent.baseTurnTorque = 0
     end
 
-    self.activateWhenLoading.SetActive(true)
-    self.deactivateWhenLoading.SetActive(false)
+    if self.activateWhenLoading != nil then
+        self.activateWhenLoading.SetActive(true)
+    end
+    if self.deactivateWhenLoading != nil then
+        self.deactivateWhenLoading.SetActive(false)
+    end
 
     coroutine.yield(WaitForSeconds(loadDuration))
 
-    self.activateWhenLoading.SetActive(false)
-    self.deactivateWhenLoading.SetActive(true)
+    if self.activateWhenLoading != nil then
+        self.activateWhenLoading.SetActive(false)
+    end
+    if self.deactivateWhenLoading != nil then
+        self.deactivateWhenLoading.SetActive(true)
+    end
 
     for i, indicator in pairs(self.imageIndicators) do
         indicator.color = self.full
@@ -237,5 +245,4 @@ end
 
 function FixedAPSAmmo:PlayEffect(j)
         self.apsParticle[j].Play(true)
-
 end
