@@ -1,4 +1,4 @@
-behaviour("SAMRadarVisual") --v1.0.0
+behaviour("SAMRadarVisual") --v1.1.0
 
 function SAMRadarVisual:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -9,6 +9,9 @@ function SAMRadarVisual:Start()
     self.lockAngle = Mathf.Cos(self.dataContainer.GetFloat("lockAngle") * Mathf.Deg2Rad) ^ 2
 
     self.loadedKeybind = false
+
+    self.activateWhenCanLock = self.targets.activateWhenCanLock
+    self.activateWhenLock = self.targets.activateWhenLock
 end
 
 function SAMRadarVisual:Update()
@@ -18,34 +21,56 @@ function SAMRadarVisual:Update()
         self.loadedKeybind = true
     end
 
-    if Input.GetKeyDown(self.lockKey) or (GameManager.isTestingContentMod and Input.GetKeyDown("\\")) then
-        if self.lockedVehicle then
-            self.lockedVehicle = nil
-        else
-            local vehiclePos = self.radarOrigin.position
-            local vehicles = {}
+    local vehicleToLock = nil
 
-            for i, vehicle in pairs(ActorManager.vehicles) do
-                if vehicle.isAirplane or vehicle.isHelicopter then
-                    vehicles[#vehicles + 1] = vehicle
-                end
-            end
+    if self.activateWhenCanLock ~= nil then
+        vehicleToLock = self:FindTargetToLock()
 
-            for i, vehicle in pairs(vehicles) do
-                local position = vehicle.transform.position
-
-                local b = position - vehiclePos
-
-                -- local inRange = b.sqrMagnitude < self.acmRange * 4
-                local inCone = self:PointInsideCone(position, self.lockAngle)
-
-                if inCone then
-                    self.lockedVehicle = vehicle
-                    break
-                end
-            end
+        if self.activateWhenCanLock ~= nil then
+            self.activateWhenCanLock.SetActive(vehicleToLock ~= false)
         end
     end
+
+    if (Input.GetKeyDown(self.lockKey) or (GameManager.isTestingContentMod and Input.GetKeyDown("\\"))) and  then
+        if self.lockedVehicle then
+            self.lockedVehicle = nil
+        elseif vehicleToLock ~= false then
+            if vehicleToLock == nil then
+                vehicleToLock = self:FindTargetToLock()
+            end
+            self.lockedVehicle = vehicleToLock
+        end
+    end
+
+    if self.activateWhenLock ~= nil then
+        self.activateWhenLock.SetActive(self.lockedVehicle ~= nil)
+    end
+end
+
+function SAMRadarVisual:FindTargetToLock()
+    local vehiclePos = self.radarOrigin.position
+    local vehicles = {}
+
+    for i, vehicle in pairs(ActorManager.vehicles) do
+        if vehicle.isAirplane or vehicle.isHelicopter then
+            vehicles[#vehicles + 1] = vehicle
+        end
+    end
+
+    for i, vehicle in pairs(vehicles) do
+        local position = vehicle.transform.position
+
+        local b = position - vehiclePos
+
+        -- local inRange = b.sqrMagnitude < self.acmRange * 4
+        local inCone = self:PointInsideCone(position, self.lockAngle)
+
+        if inCone then
+            return vehicle
+        end
+    end
+
+    return false
 end
 
 function SAMRadarVisual:VectorAngleSmaller(a, b, cos)
