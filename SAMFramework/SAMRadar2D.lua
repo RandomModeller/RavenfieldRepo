@@ -1,4 +1,4 @@
-behaviour("SAMRadar2D") --v1.0.1
+behaviour("SAMRadar2D") --v1.1.0
 
 function SAMRadar2D:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -20,7 +20,15 @@ function SAMRadar2D:Start()
 
     self.usePositionTick = self.dataContainer.GetBool("usePositionTick")
     if self.usePositionTick then
-        self.positionTick = self.dataContainer.GetFloat("positionTick")
+        self.positionTick = Vector2.zero
+
+        if (self.dataContainer.HasVector("positionTick")) then
+            self.positionTick.x = self.dataContainer.GetVector("positionTick").x
+            self.positionTick.y = self.dataContainer.GetVector("positionTick").y
+        else
+            self.positionTick.x = self.dataContainer.GetFloat("positionTick")
+            self.positionTick.y = self.dataContainer.GetFloat("positionTick")
+        end
     end
         
     self.transform = self.gameObject.transform
@@ -100,8 +108,8 @@ function SAMRadar2D:Update()
                                 blip.vehicle = vehicle
 
                                 if self.usePositionTick then
-                                    pos.x = Mathf.Floor(pos.x / self.positionTick) * self.positionTick
-                                    pos.y = Mathf.Floor(pos.y / self.positionTick) * self.positionTick
+                                    pos.x = Mathf.Floor(pos.x / self.positionTick.x) * self.positionTick.x
+                                    pos.y = Mathf.Floor(pos.y / self.positionTick.y) * self.positionTick.y
                                 end
 
                                 blip.rectTransform.anchoredPosition = pos
