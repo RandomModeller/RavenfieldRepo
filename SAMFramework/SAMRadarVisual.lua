@@ -1,4 +1,4 @@
-behaviour("SAMRadarVisual") --v1.1.0
+behaviour("SAMRadarVisual") --v1.1.1
 
 function SAMRadarVisual:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -31,7 +31,7 @@ function SAMRadarVisual:Update()
         end
     end
 
-    if (Input.GetKeyDown(self.lockKey) or (GameManager.isTestingContentMod and Input.GetKeyDown("\\"))) and  then
+    if (Input.GetKeyDown(self.lockKey) or (GameManager.isTestingContentMod and Input.GetKeyDown("\\"))) then -- thx to Nuclear Oven
         if self.lockedVehicle then
             self.lockedVehicle = nil
         elseif vehicleToLock ~= false then
@@ -103,3 +103,4 @@ function SAMRadarVisual:LoadKeybind()
         self.lockKey = KeyCode.Mouse2
     end
 end
+
