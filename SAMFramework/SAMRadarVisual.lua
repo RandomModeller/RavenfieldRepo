@@ -1,4 +1,4 @@
-behaviour("SAMRadarVisual") --v1.1.1
+behaviour("SAMRadarVisual") --v1.2.0
 
 function SAMRadarVisual:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -7,7 +7,12 @@ function SAMRadarVisual:Start()
     self.transform = self.gameObject.transform
 
     self.lockAngle = Mathf.Cos(self.dataContainer.GetFloat("lockAngle") * Mathf.Deg2Rad) ^ 2
+    self.maxRange = Mathf.Infinity
 
+    if self.dataContainer.HasFloat("maxRange") then
+        self.maxRange = self.dataContainer.GetFloat("maxRange") ^ 2
+    end
+    
     self.loadedKeybind = false
 
     self.activateWhenCanLock = self.targets.activateWhenCanLock
@@ -31,7 +36,7 @@ function SAMRadarVisual:Update()
         end
     end
 
-    if (Input.GetKeyDown(self.lockKey) or (GameManager.isTestingContentMod and Input.GetKeyDown("\\"))) then -- thx to Nuclear Oven
+    if (Input.GetKeyDown(self.lockKey) or (GameManager.isTestingContentMod and Input.GetKeyDown("\\"))) then
         if self.lockedVehicle then
             self.lockedVehicle = nil
         elseif vehicleToLock ~= false then
@@ -64,8 +69,9 @@ function SAMRadarVisual:FindTargetToLock()
 
         -- local inRange = b.sqrMagnitude < self.acmRange * 4
         local inCone = self:PointInsideCone(position, self.lockAngle)
+        local inRange = b.sqrMagnitude <= self.maxRange
 
-        if inCone then
+        if inCone and inRange then
             return vehicle
         end
     end
@@ -103,4 +109,3 @@ function SAMRadarVisual:LoadKeybind()
         self.lockKey = KeyCode.Mouse2
     end
 end
-
