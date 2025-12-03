@@ -1,4 +1,4 @@
-behaviour("VehicleGears")
+behaviour("VehicleGears") --v3.0.0
 
 function VehicleGears:Start()
     self.vehicle = self.targets.vehicleObject.GetComponent(Car)
@@ -12,6 +12,18 @@ function VehicleGears:Start()
     self.revDragValues = self:Split(self.dataContainer.GetString("reverseDragValues"), " ")
     self.revAccValues = self:Split(self.dataContainer.GetString("reverseAccValues"), " ")
     self.revSpeedLimit = self:Split(self.dataContainer.GetString("reverseSpeedLimit"), " ") -- HAS to be in descending order
+
+    self.hasNeutral = false
+    if self.dataContainer.HasBool("hasNeutral") then
+        self.hasNeutral = self.dataContainer.GetBool("hasNeutral")
+        self.neutralDragValue = self.dataContainer.GetFloat("neutralDragValue")
+        self.neutralAccValue = self.dataContainer.GetFloat("neutralAccValue")
+    end
+
+    self.neutralInWater = false
+    if self.dataContainer.HasBool("neutralInWater") then
+        self.neutralInWater = self.dataContainer.GetBool("neutralInWater")
+    end
 
     self.forwardPrefix = self.dataContainer.GetString("forwardPrefix")
     self.reversePrefix = self.dataContainer.GetString("reversePrefix")
@@ -28,15 +40,47 @@ function VehicleGears:Start()
     self.lastDrag = -1
     self.lastAcc = -1
 
-    self.hitchDrag = self.dataContainer.GetFloat("hitchDrag")
-    self.hitchAcc = self.dataContainer.GetFloat("hitchAcc")
-    self.hitchDuration = self.dataContainer.GetFloat("hitchDuration")
+    self.neutralHitchDrag = self.dataContainer.GetFloat("hitchDragNeutral")
+    self.neutralHitchAcc = self.dataContainer.GetFloat("hitchAccNeutral")
+
+    self.forwardHitchDrags = self:Split(self.dataContainer.GetString("forwardHitchDrags"), " ")
+    self.forwardHitchAccs = self:Split(self.dataContainer.GetString("forwardHitchAccs"), " ")
+    self.reverseHitchDrags = self:Split(self.dataContainer.GetString("reverseHitchDrags"), " ")
+    self.reverseHitchAccs = self:Split(self.dataContainer.GetString("reverseHitchAccs"), " ")
+
+    self.fwdHitchDurations = {}
+    self.revHitchDurations = {}
+    self.neutralHitchDuration = 0
+
+    if self.dataContainer.HasFloat("hitchDuration") then
+        local duration = self.dataContainer.GetFloat("hitchDuration")
+
+        for i = 1, #self.fwdSpeedLimit do
+            self.fwdHitchDurations[i] = duration
+        end
+
+        for i = 1, #self.revSpeedLimit do
+            self.revHitchDurations[i] = duration
+        end
+
+        self.revHitchDurations = duration
+    else
+        self.fwdHitchDurations = self:Split(self.dataContainer.GetString("fwdHitchDurations"), " ")
+        self.revHitchDurations = self:Split(self.dataContainer.GetString("revHitchDurations"), " ")
+        self.neutralHitchDuration = self.dataContainer.GetFloat("neutralHitchDuration")
+    end
+
+    --self.hitchDuration = self.dataContainer.GetFloat("hitchDuration")
     self.controlGainDelay = self.dataContainer.GetFloat("controlDelay")
     self.hitchPower = self.dataContainer.GetFloat("hitchPower")
 
     self.hillBase = self.dataContainer.GetFloat("hillBase")
     self.hillBaseDelta = 1 - self.hillBase
     self.hillBaseFactor = self.hillBaseDelta / 90
+    self.hillNeutral = 36000
+    if self.dataContainer.HasFloat("hillNeutral") then
+        self.hillNeutral = self.dataContainer.GetFloat("hillNeutral")
+    end
 
     self.durationLeft = 0
     self.dragLeft = 0
@@ -45,65 +89,109 @@ function VehicleGears:Start()
     self.baseAcc= 0
     self.unlocked = 0
 
+    self.lastReverse = false
+
+    self.gear = 0
+
+    self.cacheVelocity = 0
+
     --self.gearZip = self:Zip(self.availableModes, self.fireModeValues)
 end
 
 function VehicleGears:Update()
     local reverse = self.vehicle.inReverseGear
-    local velocity = math.abs(self.vehicleTransform.worldToLocalMatrix.MultiplyVector(self.vehicleRigidbody.velocity).z * 3.6)
+    local mode = 0
+
+    if reverse ~= self.lastReverse then
+        self.unlocked = 0
+        self.lastReverse = reverse
+    end
+
+    self.cacheVelocity = math.abs(self.vehicleTransform.worldToLocalMatrix.MultiplyVector(self.vehicleRigidbody.velocity).z * 3.6)
 
     local tableToUse = reverse and self.revSpeedLimit or self.fwdSpeedLimit
 
-    for i, speed in pairs(tableToUse) do
-        if velocity >= speed and Time.time > self.unlocked then
-            local dragForSpeed = self.fwdDragValues[i]
-            local accForSpeed = self.fwdAccValues[i]
+    local angle = self.vehicleTransform.eulerAngles.x
 
-            if reverse then
-                dragForSpeed = self.revDragValues[i]
-                accForSpeed = self.revAccValues[i]
-            end
+    if angle <= 90 then
+        angle = -angle
+    elseif angle >= 270 then
+        angle = 360 - angle
+    end
+
+    local hitchDragForFrame = self.neutralHitchDrag
+    local hitchAccForFrame = self.neutralHitchAcc
+
+    if (self.neutralInWater and self.vehicle.isInWater) or (self.hasNeutral and self.cacheVelocity <= 0.1) or (angle >= self.hillNeutral) then
+        local dragForSpeed = self.neutralDragValue
+        local accForSpeed = self.neutralAccValue
+
+        self.gear = 0
             
-            if dragForSpeed ~= self.lastDrag or accForSpeed ~= self.lastAcc then
+        if dragForSpeed ~= self.lastDrag or accForSpeed ~= self.lastAcc then
+            self:OnHitchChange(mode)
+            self.lastDrag = dragForSpeed
+            self.baseDrag = dragForSpeed
 
-                self:OnHitchChange()
-                self.lastDrag = dragForSpeed
-                self.baseDrag = dragForSpeed
+            self.lastAcc = accForSpeed
+            self.baseAcc = accForSpeed
+        end
 
-                self.lastAcc = accForSpeed
-                self.baseAcc = accForSpeed
+        local prefix = reverse and self.reversePrefix or self.forwardPrefix
+        local suffix = reverse and self.reverseSuffix or self.forwardSuffix
+
+        self.gearText.text = prefix .. "N" .. suffix
+    else
+        for i, speed in pairs(tableToUse) do
+            if self.cacheVelocity >= speed and Time.time > self.unlocked then
+                local dragForSpeed = self.fwdDragValues[i]
+                local accForSpeed = self.fwdAccValues[i]
+
+                hitchDragForFrame = self.forwardHitchDrags[i]
+                hitchAccForFrame = self.forwardHitchAccs[i]
+
+                self.gear = i
+                mode = 1
+                if reverse then
+                    hitchDragForFrame = self.reverseHitchDrags[i]
+                    hitchAccForFrame = self.reverseHitchAccs[i]
+
+                    dragForSpeed = self.revDragValues[i]
+                    accForSpeed = self.revAccValues[i]
+                    mode = -1
+                end
+
+            
+                if dragForSpeed ~= self.lastDrag or accForSpeed ~= self.lastAcc then
+                    self:OnHitchChange(mode)
+                    self.lastDrag = dragForSpeed
+                    self.baseDrag = dragForSpeed
+
+                    self.lastAcc = accForSpeed
+                    self.baseAcc = accForSpeed
+                end
+
+                local prefix = reverse and self.reversePrefix or self.forwardPrefix
+                local suffix = reverse and self.reverseSuffix or self.forwardSuffix
+                local gearNum = reverse and self.revGearCount or self.fwdGearCount
+
+                self.gearText.text = prefix .. (gearNum - i) .. suffix
+                break
             end
-
-            local prefix = reverse and self.reversePrefix or self.forwardPrefix
-            local suffix = reverse and self.reverseSuffix or self.forwardSuffix
-            local gearNum = reverse and self.revGearCount or self.fwdGearCount
-
-            self.gearText.text = prefix .. (gearNum - i) .. suffix
-            break
         end
     end
 
-    local left = self.durationLeft / self.hitchDuration
+    local left = self.durationLeft / self:GetHitchDuration(mode)
 
-    self.vehicle.groundDrag = self.baseDrag + self.hitchDrag * left
+    self.vehicle.groundDrag = self.baseDrag + hitchDragForFrame * left
 
-    local angle = self.vehicleTransform.eulerAngles.x
-
-    if angle < 90 then
-        angle = 90 - angle
-    elseif angle > 270 then
-        angle = angle - 270
-    end
-
-
-    local hillFactor = (angle * self.hillBaseFactor) + self.hillBase
+    local hillFactor = 1 - (angle * self.hillBaseFactor)
 
     if reverse then
-        self.vehicle.reverseAcceleration = (self.baseAcc * hillFactor) + (self.hitchAcc * left)
+        self.vehicle.reverseAcceleration = (self.baseAcc * hillFactor) + (hitchAccForFrame * left)
     else
-        self.vehicle.acceleration = (self.baseAcc * hillFactor) + (self.hitchAcc * left)
+        self.vehicle.acceleration = (self.baseAcc * hillFactor) + (hitchAccForFrame * left)
     end
-
 
     if self.durationLeft > 0 then
         self.durationLeft = self.durationLeft - Time.deltaTime
@@ -112,11 +200,21 @@ function VehicleGears:Update()
     end
 end
 
-function VehicleGears:OnHitchChange()
+function VehicleGears:GetHitchDuration(gearType)
+    if gearType == 1 then -- forward gear
+        return self.fwdHitchDurations[self.gear]
+    elseif gearType == 0 then -- neutral gear
+        return self.neutralHitchDuration
+    elseif gearType == -1 then -- reverse gear
+        return self.revHitchDurations[self.gear]
+    end
+end
+
+function VehicleGears:OnHitchChange(type)
     self.hitchSoundBank.PlayRandom()
     
-    self.durationLeft = self.hitchDuration
-    self.unlocked = Time.time + self.hitchDuration + self.controlGainDelay
+    self.durationLeft = self:GetHitchDuration(type)
+    self.unlocked = Time.time + self.durationLeft + self.controlGainDelay
     self.dragLeft = 0
 
     self.vehicle.engine.power = self.hitchPower
@@ -127,7 +225,7 @@ function VehicleGears:Split(s, delimiter)
     for match in (s..delimiter):gmatch("(.-)"..delimiter) do
         table.insert(result, tonumber(match))
     end
-    return result
+    return result   
 end
 
 function VehicleGears:Zip(keyArray, valueArray)
