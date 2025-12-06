@@ -1,4 +1,4 @@
-behaviour("APSAmmoInstant") --v1.0.0
+behaviour("APSAmmoInstant") --v1.1.0
 
 function APSAmmoInstant:Start()
     self.vehicle = self.targets.vehicleObject.GetComponent(Vehicle)
@@ -52,6 +52,12 @@ function APSAmmoInstant:Start()
     if self.dataContainer.HasBool("reloadImmobilize") then
         self.apsReloadImmobilize = self.dataContainer.GetBool("reloadImmobilize")
     end
+
+    self.interceptFriendly = false
+    if self.dataContainer.HasBool("interceptFriendly") then
+        self.interceptFriendly = self.dataContainer.GetBool("interceptFriendly")
+    end
+    self.interceptFriendly = self.interceptFriendly or GameManager.isTestingContentMod
 
     self.full = Color(0, 255, 0)
     self.empty = Color(255, 0, 0)
@@ -148,7 +154,7 @@ function APSAmmoInstant:onProjectileSpawned(projectile)
     if self.vehicle.driver == nil then
         return
     end
-    if projectile.source.team == self.vehicle.driver.team then
+    if (not self.interceptFriendly) and projectile.source.team == self.vehicle.driver.team then
         return
     end
     if not (projectile.isTargetSeekingMissileProjectile) and not (projectile.isExplodingProjectile and not projectile.sourceWeapon.isAuto) then
@@ -275,5 +281,4 @@ function APSAmmoInstant:PlayEffect(index, projPosition)
     pitch.LookAt(projPosition, -bearing.forward)
 
     self.apsParticle[index].Play(true)
-
 end
