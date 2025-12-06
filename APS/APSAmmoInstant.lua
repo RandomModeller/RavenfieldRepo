@@ -1,4 +1,4 @@
-behaviour("APSAmmoInstant") --v1.1.0
+behaviour("APSAmmoInstant") --v1.1.1
 
 function APSAmmoInstant:Start()
     self.vehicle = self.targets.vehicleObject.GetComponent(Vehicle)
@@ -154,7 +154,7 @@ function APSAmmoInstant:onProjectileSpawned(projectile)
     if self.vehicle.driver == nil then
         return
     end
-    if (not self.interceptFriendly) and projectile.source.team == self.vehicle.driver.team then
+    if self.interceptFriendly and projectile.source.team == self.vehicle.driver.team then
         return
     end
     if not (projectile.isTargetSeekingMissileProjectile) and not (projectile.isExplodingProjectile and not projectile.sourceWeapon.isAuto) then
