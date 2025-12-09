@@ -1,4 +1,4 @@
-behaviour("VehicleGears") --v3.0.0
+behaviour("VehicleGears") --v3.0.1
 
 function VehicleGears:Start()
     self.vehicle = self.targets.vehicleObject.GetComponent(Car)
@@ -22,26 +22,37 @@ function VehicleGears:Start()
 
     self.neutralInWater = false
     if self.dataContainer.HasBool("neutralInWater") then
-        self.neutralInWater = self.dataContainer.GetBool("neutralInWater")
+        self.neutralInWater = self.dataContainer.GetBool("neutralInWater") and self.hasNeutral
     end
-
-    self.forwardPrefix = self.dataContainer.GetString("forwardPrefix")
-    self.reversePrefix = self.dataContainer.GetString("reversePrefix")
-    self.forwardSuffix = self.dataContainer.GetString("forwardSuffix")
-    self.reverseSuffix = self.dataContainer.GetString("reverseSuffix")
 
     self.fwdGearCount = #self.fwdSpeedLimit + 1
     
     self.revGearCount = #self.revSpeedLimit + 1
 
-    self.gearText = self.targets.gearText.GetComponent(Text)
+    if self.targets.gearText ~= nil then
+        self.gearText = self.targets.gearText.GetComponent(Text)
 
-    self.hitchSoundBank = self.targets.soundBank.GetComponent(SoundBank)
+        self.forwardPrefix = self.dataContainer.GetString("forwardPrefix")
+        self.reversePrefix = self.dataContainer.GetString("reversePrefix")
+        self.forwardSuffix = self.dataContainer.GetString("forwardSuffix")
+        self.reverseSuffix = self.dataContainer.GetString("reverseSuffix")
+    end
+
+    if self.targets.soundBank ~= nil then
+        self.hitchSoundBank = self.targets.soundBank.GetComponent(SoundBank)
+    end
     self.lastDrag = -1
     self.lastAcc = -1
 
-    self.neutralHitchDrag = self.dataContainer.GetFloat("hitchDragNeutral")
-    self.neutralHitchAcc = self.dataContainer.GetFloat("hitchAccNeutral")
+    self.neutralHitchDrag = 0
+    if self.dataContainer.HasFloat("hitchDragNeutral") and self.hasNeutral then
+        self.neutralHitchDrag = self.dataContainer.GetFloat("hitchDragNeutral")
+    end
+
+    self.neutralHitchAcc = 0
+    if self.dataContainer.HasFloat("hitchAccNeutral") and self.hasNeutral then
+        self.neutralHitchAcc = self.dataContainer.GetFloat("hitchAccNeutral")
+    end
 
     self.forwardHitchDrags = self:Split(self.dataContainer.GetString("forwardHitchDrags"), " ")
     self.forwardHitchAccs = self:Split(self.dataContainer.GetString("forwardHitchAccs"), " ")
@@ -79,7 +90,7 @@ function VehicleGears:Start()
     self.hillBaseFactor = self.hillBaseDelta / 90
     self.hillNeutral = 36000
     if self.dataContainer.HasFloat("hillNeutral") then
-        self.hillNeutral = self.dataContainer.GetFloat("hillNeutral")
+        self.hillNeutral = self.dataContainer.GetFloat("hillNeutral") and self.hasNeutral
     end
 
     self.durationLeft = 0
@@ -136,11 +147,13 @@ function VehicleGears:Update()
             self.lastAcc = accForSpeed
             self.baseAcc = accForSpeed
         end
+        
+        if self.gearText ~= nil then
+            local prefix = reverse and self.reversePrefix or self.forwardPrefix
+            local suffix = reverse and self.reverseSuffix or self.forwardSuffix
 
-        local prefix = reverse and self.reversePrefix or self.forwardPrefix
-        local suffix = reverse and self.reverseSuffix or self.forwardSuffix
-
-        self.gearText.text = prefix .. "N" .. suffix
+            self.gearText.text = prefix .. "N" .. suffix
+        end
     else
         for i, speed in pairs(tableToUse) do
             if self.cacheVelocity >= speed and Time.time > self.unlocked then
@@ -171,11 +184,13 @@ function VehicleGears:Update()
                     self.baseAcc = accForSpeed
                 end
 
-                local prefix = reverse and self.reversePrefix or self.forwardPrefix
-                local suffix = reverse and self.reverseSuffix or self.forwardSuffix
-                local gearNum = reverse and self.revGearCount or self.fwdGearCount
+                if self.gearText ~= nil then
+                    local prefix = reverse and self.reversePrefix or self.forwardPrefix
+                    local suffix = reverse and self.reverseSuffix or self.forwardSuffix
+                    local gearNum = reverse and self.revGearCount or self.fwdGearCount
 
-                self.gearText.text = prefix .. (gearNum - i) .. suffix
+                    self.gearText.text = prefix .. (gearNum - i) .. suffix
+                end
                 break
             end
         end
@@ -187,10 +202,12 @@ function VehicleGears:Update()
 
     local hillFactor = 1 - (angle * self.hillBaseFactor)
 
+    local acc = (self.baseAcc * hillFactor) + (hitchAccForFrame * left)
+
     if reverse then
-        self.vehicle.reverseAcceleration = (self.baseAcc * hillFactor) + (hitchAccForFrame * left)
+        self.vehicle.reverseAcceleration = acc
     else
-        self.vehicle.acceleration = (self.baseAcc * hillFactor) + (hitchAccForFrame * left)
+        self.vehicle.acceleration = acc
     end
 
     if self.durationLeft > 0 then
@@ -211,8 +228,10 @@ function VehicleGears:GetHitchDuration(gearType)
 end
 
 function VehicleGears:OnHitchChange(type)
-    self.hitchSoundBank.PlayRandom()
-    
+    if self.hitchSoundBank ~= nil then
+        self.hitchSoundBank.PlayRandom()
+    end
+
     self.durationLeft = self:GetHitchDuration(type)
     self.unlocked = Time.time + self.durationLeft + self.controlGainDelay
     self.dragLeft = 0
