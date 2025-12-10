@@ -1,4 +1,4 @@
-behaviour("VehicleGears") --v3.0.1
+behaviour("VehicleGears") --v3.1.0
 
 function VehicleGears:Start()
     self.vehicle = self.targets.vehicleObject.GetComponent(Car)
@@ -25,9 +25,9 @@ function VehicleGears:Start()
         self.neutralInWater = self.dataContainer.GetBool("neutralInWater") and self.hasNeutral
     end
 
-    self.fwdGearCount = #self.fwdSpeedLimit + 1
+    self.fwdGearCount = #self.fwdSpeedLimit
     
-    self.revGearCount = #self.revSpeedLimit + 1
+    self.revGearCount = #self.revSpeedLimit
 
     if self.targets.gearText ~= nil then
         self.gearText = self.targets.gearText.GetComponent(Text)
@@ -74,7 +74,7 @@ function VehicleGears:Start()
             self.revHitchDurations[i] = duration
         end
 
-        self.revHitchDurations = duration
+        self.neutralHitchDuration = duration
     else
         self.fwdHitchDurations = self:Split(self.dataContainer.GetString("fwdHitchDurations"), " ")
         self.revHitchDurations = self:Split(self.dataContainer.GetString("revHitchDurations"), " ")
@@ -89,8 +89,8 @@ function VehicleGears:Start()
     self.hillBaseDelta = 1 - self.hillBase
     self.hillBaseFactor = self.hillBaseDelta / 90
     self.hillNeutral = 36000
-    if self.dataContainer.HasFloat("hillNeutral") then
-        self.hillNeutral = self.dataContainer.GetFloat("hillNeutral") and self.hasNeutral
+    if self.dataContainer.HasFloat("hillNeutral") and self.hasNeutral then
+        self.hillNeutral = self.dataContainer.GetFloat("hillNeutral")
     end
 
     self.durationLeft = 0
@@ -133,7 +133,7 @@ function VehicleGears:Update()
     local hitchDragForFrame = self.neutralHitchDrag
     local hitchAccForFrame = self.neutralHitchAcc
 
-    if (self.neutralInWater and self.vehicle.isInWater) or (self.hasNeutral and self.cacheVelocity <= 0.1) or (angle >= self.hillNeutral) then
+    if (self.neutralInWater and self.vehicle.isInWater) or (self.hasNeutral and self.cacheVelocity <= 0.2) or (angle >= self.hillNeutral) then
         local dragForSpeed = self.neutralDragValue
         local accForSpeed = self.neutralAccValue
 
@@ -185,9 +185,9 @@ function VehicleGears:Update()
                 end
 
                 if self.gearText ~= nil then
+                    local gearNum = reverse and self.revGearCount or self.fwdGearCount
                     local prefix = reverse and self.reversePrefix or self.forwardPrefix
                     local suffix = reverse and self.reverseSuffix or self.forwardSuffix
-                    local gearNum = reverse and self.revGearCount or self.fwdGearCount
 
                     self.gearText.text = prefix .. (gearNum - i) .. suffix
                 end
@@ -215,6 +215,7 @@ function VehicleGears:Update()
     else
         self.durationLeft = 0
     end
+
 end
 
 function VehicleGears:GetHitchDuration(gearType)
