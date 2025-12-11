@@ -1,4 +1,4 @@
-behaviour("APSAmmoInstant") --v1.1.1
+behaviour("APSAmmoInstant") --v1.2.0
 
 function APSAmmoInstant:Start()
     self.vehicle = self.targets.vehicleObject.GetComponent(Vehicle)
@@ -37,6 +37,7 @@ function APSAmmoInstant:Start()
     self.turretTransform = {}
     self.apsAmmo = {}
     self.maxAmmo = {}
+    self.colorGradient = {}
     self.currentIndex = 1
 
     for i, aps in pairs(self.dataContainer.GetGameObjectArray("aps")) do
@@ -44,7 +45,19 @@ function APSAmmoInstant:Start()
         self.apsParticle[i] = aps.GetComponentInChildren(ParticleSystem)
         self.apsTransform[i] = aps.transform
         self.turretTransform[i] = self.dataContainer.GetGameObject("turret" .. tostring(i)).transform
-        self.maxAmmo[i] = self.dataContainer.GetFloat("apsAmmo" .. i)
+
+        if self.dataContainer.HasFloat("apsAmmo") then
+            self.maxAmmo[i] = self.dataContainer.GetFloat("apsAmmo")
+        else
+            self.maxAmmo[i] = self.dataContainer.GetFloat("apsAmmo" .. i)
+        end
+
+        if self.dataContainer.HasGradient("colorGradient") then
+            self.colorGradient[i] = self.dataContainer.GetGradient("colorGradient")
+        else
+            self.colorGradient[i] = self.dataContainer.GetGradient("colorGradient" .. i)
+        end
+
         self.apsAmmo[i] = self.maxAmmo[i]
     end
 
@@ -59,8 +72,8 @@ function APSAmmoInstant:Start()
     end
     self.interceptFriendly = self.interceptFriendly or GameManager.isTestingContentMod
 
-    self.full = Color(0, 255, 0)
-    self.empty = Color(255, 0, 0)
+    -- self.full = Color(0, 255, 0)
+    -- self.empty = Color(255, 0, 0)
 
     self.imageIndicators = {}
     
@@ -124,7 +137,7 @@ function APSAmmoInstant:LoadAPS()
     end
 
     for i, indicator in pairs(self.imageIndicators) do
-        indicator.color = self.full
+        indicator.color = self.colorGradient[i].Evaluate(1)
     end
         
     for i, aps in pairs(self.apsAmmo) do
@@ -154,7 +167,7 @@ function APSAmmoInstant:onProjectileSpawned(projectile)
     if self.vehicle.driver == nil then
         return
     end
-    if self.interceptFriendly and projectile.source.team == self.vehicle.driver.team then
+    if (not self.interceptFriendly) and projectile.source.team == self.vehicle.driver.team then
         return
     end
     if not (projectile.isTargetSeekingMissileProjectile) and not (projectile.isExplodingProjectile and not projectile.sourceWeapon.isAuto) then
@@ -231,18 +244,17 @@ function APSAmmoInstant:Update()
                             -- if proj.velocity.sqrMagnitude > 0.01f then
                             -- if (Vector3.Dot(delta, proj.transform.forward) ^ 2) / delta.sqrMagnitude >= self.angleCos20 then
 
-
                             self:Intercept(proj, i)
                             self:PlayEffect(self.currentIndex, projPosition)
                             self.apsAmmo[self.currentIndex] = self.apsAmmo[self.currentIndex] - 1
                             destroyedProjPositions[#destroyedProjPositions + 1] = projPosition
 
+                            if self.imageIndicators[self.currentIndex] ~= nil then
+                                self.imageIndicators[self.currentIndex].color = self.colorGradient[self.currentIndex].Evaluate(self.apsAmmo[self.currentIndex] / self.maxAmmo[self.currentIndex])
+                            end
+
                             if self.apsAmmo[self.currentIndex] == 0 then
                                 self.currentIndex = self.currentIndex + 1
-
-                                if self.imageIndicators[self.currentIndex] ~= nil then
-                                    self.imageIndicators[self.currentIndex].color = self.empty
-                                end
                             end
 
                             break
