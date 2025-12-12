@@ -1,4 +1,4 @@
-behaviour("APSAmmoInstant") --v1.4.3
+behaviour("APSAmmoInstant") --v1.4.4
 
 function APSAmmoInstant:Start()
     self.vehicle = self.targets.vehicleObject.GetComponent(Vehicle)
@@ -83,6 +83,8 @@ function APSAmmoInstant:Start()
         if self.imageIndicators[i] == nil then
             self.imageIndicators[i] = indicator.GetComponent(Text)
         end
+
+        self.imageIndicators[i].color = self.colorGradient[i].Evaluate(1)
     end
 
     self.textIndicators = {}
