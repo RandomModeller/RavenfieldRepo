@@ -1,4 +1,4 @@
-behaviour("APSAmmoInstant") --v1.4.0
+behaviour("APSAmmoInstant") --v1.4.1
 
 function APSAmmoInstant:Start()
     self.vehicle = self.targets.vehicleObject.GetComponent(Vehicle)
@@ -150,8 +150,8 @@ function APSAmmoInstant:LoadAPS()
         indicator.color = self.colorGradient[i].Evaluate(1)
     end
 
-    for i, text in pairs(self.textIndicators) do
-        text.color = self.colorGradient[i].Evaluate(1)
+    if i, text in pairs(self.textIndicators) then
+        text.text = tostring(self.apsAmmo[i])
     end
         
     for i, aps in pairs(self.apsAmmo) do
