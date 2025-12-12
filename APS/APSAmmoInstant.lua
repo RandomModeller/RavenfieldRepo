@@ -1,4 +1,4 @@
-behaviour("APSAmmoInstant") --v1.2.0
+behaviour("APSAmmoInstant") --v1.3.0
 
 function APSAmmoInstant:Start()
     self.vehicle = self.targets.vehicleObject.GetComponent(Vehicle)
@@ -81,6 +81,12 @@ function APSAmmoInstant:Start()
         self.imageIndicators[i] = indicator.GetComponent(Image)
     end
 
+    self.textIndicators = {}
+    
+    for i, text in pairs(self.dataContainer.GetGameObjectArray("text")) do
+        self.textIndicators[i] = text.GetComponent(Text)
+    end
+
     self.accel = self.accelComponent.acceleration
     self.turnTorque = self.accelComponent.baseTurnTorque
 
@@ -138,6 +144,10 @@ function APSAmmoInstant:LoadAPS()
 
     for i, indicator in pairs(self.imageIndicators) do
         indicator.color = self.colorGradient[i].Evaluate(1)
+    end
+
+    for i, text in pairs(self.textIndicators) do
+        text.color = self.colorGradient[i].Evaluate(1)
     end
         
     for i, aps in pairs(self.apsAmmo) do
@@ -251,6 +261,10 @@ function APSAmmoInstant:Update()
 
                             if self.imageIndicators[self.currentIndex] ~= nil then
                                 self.imageIndicators[self.currentIndex].color = self.colorGradient[self.currentIndex].Evaluate(self.apsAmmo[self.currentIndex] / self.maxAmmo[self.currentIndex])
+                            end
+
+                            if self.textIndicators[self.currentIndex] ~= nil then
+                                self.textIndicators[self.currentIndex].color = self.colorGradient[self.currentIndex].Evaluate(self.apsAmmo[self.currentIndex] / self.maxAmmo[self.currentIndex])
                             end
 
                             if self.apsAmmo[self.currentIndex] == 0 then
