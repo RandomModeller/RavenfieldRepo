@@ -77,6 +77,12 @@ function FixedAPSAmmo:Start()
     
     for i, indicator in pairs(self.dataContainer.GetGameObjectArray("indicator")) do
         self.imageIndicators[i] = indicator.GetComponent(Image)
+
+        if self.imageIndicators[i] == nil then
+            self.imageIndicators[i] = indicator.GetComponent(Text)
+        end
+
+        self.imageIndicators[i].color = self.colorGradient[i].Evaluate(1)
     end
 
     self.accel = self.accelComponent.acceleration
@@ -136,7 +142,7 @@ function FixedAPSAmmo:LoadAPS()
         indicator.color = self.colorGradient[i].Evaluate(1)
     end
     
-    for i, text in pairs(self.textIndicators) do
+    if i, text in pairs(self.textIndicators) then
         text.text = tostring(self.apsAmmo[i])
     end
         
@@ -272,4 +278,3 @@ end
 function FixedAPSAmmo:PlayEffect(j)
         self.apsParticle[j].Play(true)
 end
-
