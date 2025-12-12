@@ -1,4 +1,4 @@
-behaviour("FixedAPSAmmo") --v1.1.1
+behaviour("FixedAPSAmmo") --v1.2.0
 
 function FixedAPSAmmo:Start()
     self.vehicle = self.targets.vehicleObject.GetComponent(Vehicle)
@@ -43,7 +43,19 @@ function FixedAPSAmmo:Start()
         self.allAps[i] = aps
         self.apsParticle[i] = aps.GetComponentInChildren(ParticleSystem)
         self.apsTransform[i] = aps.transform
-        self.maxAmmo[i] = self.dataContainer.GetFloat("apsAmmo" .. i)
+
+        if self.dataContainer.HasFloat("apsAmmo") then
+            self.maxAmmo[i] = self.dataContainer.GetFloat("apsAmmo")
+        else
+            self.maxAmmo[i] = self.dataContainer.GetFloat("apsAmmo" .. i)
+        end
+
+        if self.dataContainer.HasGradient("colorGradient") then
+            self.colorGradient[i] = self.dataContainer.GetGradient("colorGradient")
+        else
+            self.colorGradient[i] = self.dataContainer.GetGradient("colorGradient" .. i)
+        end
+
         self.apsAmmo[i] = self.maxAmmo[i]
     end
 
@@ -52,8 +64,14 @@ function FixedAPSAmmo:Start()
         self.apsReloadImmobilize = self.dataContainer.GetBool("reloadImmobilize")
     end
 
-    self.full = Color(0, 255, 0)
-    self.empty = Color(255, 0, 0)
+    self.interceptFriendly = false
+    if self.dataContainer.HasBool("interceptFriendly") then
+        self.interceptFriendly = self.dataContainer.GetBool("interceptFriendly")
+    end
+    self.interceptFriendly = self.interceptFriendly or GameManager.isTestingContentMod
+
+    -- self.full = Color(0, 255, 0)
+    -- self.empty = Color(255, 0, 0)
 
     self.imageIndicators = {}
     
@@ -115,7 +133,11 @@ function FixedAPSAmmo:LoadAPS()
     end
 
     for i, indicator in pairs(self.imageIndicators) do
-        indicator.color = self.full
+        indicator.color = self.colorGradient[i].Evaluate(1)
+    end
+    
+    if i, text in pairs(self.textIndicators) then
+        text.text = tostring(self.apsAmmo[i])
     end
         
     for i, aps in pairs(self.apsAmmo) do
@@ -143,7 +165,7 @@ function FixedAPSAmmo:onProjectileSpawned(projectile)
     if self.vehicle.driver == nil then
         return
     end
-    if projectile.source.team == self.vehicle.driver.team then
+    if (not self.interceptFriendly) and projectile.source.team == self.vehicle.driver.team then
         return
     end
     if not (projectile.isTargetSeekingMissileProjectile) and not (projectile.isExplodingProjectile and not projectile.sourceWeapon.isAuto) then
@@ -220,8 +242,12 @@ function FixedAPSAmmo:Update()
                                         self.apsAmmo[j] = self.apsAmmo[j] - 1
                                         destroyedProjPositions[#destroyedProjPositions + 1] = projPosition
 
-                                        if self.apsAmmo[j] == 0 and self.imageIndicators[j] ~= nil then
-                                            self.imageIndicators[j].color = self.empty
+                                        if self.imageIndicators[j] ~= nil then
+                                            self.imageIndicators[j].color = self.colorGradient[j].Evaluate(self.apsAmmo[j] / self.maxAmmo[j])
+                                        end
+            
+                                        if self.textIndicators[j] ~= nil then
+                                            self.textIndicators[j].text = tostring(self.apsAmmo[j])
                                         end
 
                                         break
