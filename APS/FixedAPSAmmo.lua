@@ -1,4 +1,4 @@
-behaviour("FixedAPSAmmo") --v1.2.0
+behaviour("FixedAPSAmmo") --v1.2.1
 
 function FixedAPSAmmo:Start()
     self.vehicle = self.targets.vehicleObject.GetComponent(Vehicle)
@@ -136,7 +136,7 @@ function FixedAPSAmmo:LoadAPS()
         indicator.color = self.colorGradient[i].Evaluate(1)
     end
     
-    if i, text in pairs(self.textIndicators) then
+    for i, text in pairs(self.textIndicators) do
         text.text = tostring(self.apsAmmo[i])
     end
         
@@ -272,3 +272,4 @@ end
 function FixedAPSAmmo:PlayEffect(j)
         self.apsParticle[j].Play(true)
 end
+
