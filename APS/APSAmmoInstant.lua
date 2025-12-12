@@ -1,4 +1,4 @@
-behaviour("APSAmmoInstant") --v1.4.2
+behaviour("APSAmmoInstant") --v1.4.3
 
 function APSAmmoInstant:Start()
     self.vehicle = self.targets.vehicleObject.GetComponent(Vehicle)
@@ -312,4 +312,5 @@ function APSAmmoInstant:PlayEffect(index, projPosition)
 
     self.apsParticle[index].Play(true)
 end
+
 
