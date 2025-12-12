@@ -1,4 +1,4 @@
-behaviour("APSAmmoInstant") --v1.3.0
+behaviour("APSAmmoInstant") --v1.4.0
 
 function APSAmmoInstant:Start()
     self.vehicle = self.targets.vehicleObject.GetComponent(Vehicle)
@@ -79,6 +79,10 @@ function APSAmmoInstant:Start()
     
     for i, indicator in pairs(self.dataContainer.GetGameObjectArray("indicator")) do
         self.imageIndicators[i] = indicator.GetComponent(Image)
+
+        if self.imageIndicators[i] == nil then
+            self.imageIndicators[i] = indicator.GetComponent(Text)
+        end
     end
 
     self.textIndicators = {}
@@ -264,7 +268,7 @@ function APSAmmoInstant:Update()
                             end
 
                             if self.textIndicators[self.currentIndex] ~= nil then
-                                self.textIndicators[self.currentIndex].color = self.colorGradient[self.currentIndex].Evaluate(self.apsAmmo[self.currentIndex] / self.maxAmmo[self.currentIndex])
+                                self.textIndicators[self.currentIndex].text = tostring(self.apsAmmo[self.currentIndex])
                             end
 
                             if self.apsAmmo[self.currentIndex] == 0 then
