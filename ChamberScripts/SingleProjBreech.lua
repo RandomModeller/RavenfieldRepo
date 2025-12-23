@@ -1,4 +1,4 @@
-behaviour("SingleProjBreech") -- v1.0.1
+behaviour("SingleProjBreech") -- v1.0.3
 
 function SingleProjBreech:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -22,6 +22,7 @@ end
 
 function SingleProjBreech:Update()
     local allEmpty = false
+    local allHolstered = false
 
     for i, cannon in pairs(self.cannons) do
         if i == self.activeCannonIndex then
@@ -33,10 +34,18 @@ function SingleProjBreech:Update()
                 cannon.ammo = 0
             end
         end
+
+        allHolstered = allHolstered or cannon.isUnholstered
     end
 
     for i, cannon in pairs(self.cannons) do
-        if allEmpty and cannon.isUnholstered then
+        if cannon.isReloading and cannon.spareAmmo == 1 and not allHolstered then
+            cannon.spareAmmo = 1
+        elseif not cannon.isUnholstered then
+            cannon.spareAmmo = 0
+        elseif cannon.isReloading and cannon.spareAmmo == 0 then
+            cannon.spareAmmo = 0
+        elseif allEmpty then
             cannon.spareAmmo = 1
         else
             cannon.spareAmmo = 0
