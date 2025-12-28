@@ -1,4 +1,4 @@
-behaviour("FalconCountermeasures") --v1.0.0
+behaviour("FalconCountermeasures") --v1.0.1
 
 function FalconCountermeasures:Start()
     self.vehicleObject = self.targets.vehicleObject.GetComponent(Vehicle)
@@ -96,14 +96,10 @@ function FalconCountermeasures:Update()
 end
 
 function FalconCountermeasures:PlayerCountermeasure()
-    local m = (self.chanceClose - self.chanceFar) / (self.rangeFar - self.rangeClose)
-
     for i, missile in pairs(self.vehicleObject.GetTrackingMissiles()) do
-        local chance = 0
-
         local sqrRange = (missile.transform.position - self.transform.position).sqrMagnitude
 
-        local factor = Mathf.Clamp((self.rangeClose - sqrRange) * m, 0, 1) + self.chanceClose
+        local chance = Mathf.Lerp(self.chanceClose, self.chanceFar, (sqrRange - self.rangeClose) / (self.rangeFar - self.rangeClose))
 
         if Random.Range(0, 1) <= chance then
             missile.ClearTrackerTarget()
