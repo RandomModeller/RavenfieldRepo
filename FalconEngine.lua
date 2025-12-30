@@ -1,4 +1,4 @@
-behaviour("FalconEngine") --v1.0.0
+behaviour("FalconEngine") --v1.1.0
 
 function FalconEngine:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -10,15 +10,23 @@ function FalconEngine:Start()
     self.milPowerMax = self.dataContainer.GetFloat("milPowerMax")
     self.afterburnerPowerMax = self.dataContainer.GetFloat("afterburnerPowerMax")
 
-    self.throttle = self.targets.throttle.transform
-    self.throttleRotMin = self.dataContainer.GetFloat("throttleRotMin")
-    self.throttleRotAft = self.dataContainer.GetFloat("throttleRotAft")
-    self.throttleRotMax = self.dataContainer.GetFloat("throttleRotMax")
+    if self.targets.throttle ~= nil then
+        self.throttle = self.targets.throttle.transform
+        self.throttleRotMin = self.dataContainer.GetFloat("throttleRotMin")
+        self.throttleRotAft = self.dataContainer.GetFloat("throttleRotAft")
+        self.throttleRotMax = self.dataContainer.GetFloat("throttleRotMax")
 
-    self.nozzle = self.targets.nozzle.GetComponent(SkinnedMeshRenderer)
-    self.nozzlePos = 0
-    self.targetNozzlePos = 0
-    self.nozzlePosPerSecond = 90
+        self.throttle.localEulerAngles = Vector3(self.throttleRotMin, 0, 0)
+    end
+
+    if self.targets.nozzle ~= nil then
+        self.nozzle = self.targets.nozzle.GetComponent(SkinnedMeshRenderer)
+        self.nozzlePos = 0
+        self.targetNozzlePos = 0
+        self.nozzlePosPerSecond = 90
+
+        self.nozzle.SetBlendShapeWeight(0, 0)
+    end
 
     self.defaultAcceleration = self.vehicle.acceleration
     self.defaultAccelerationThrottleUp = self.vehicle.accelerationThrottleUp
@@ -28,9 +36,7 @@ function FalconEngine:Start()
     self.vehicle.accelerationThrottleDown = 0
     self.vehicle.accelerationThrottleUp = 0
 
-    self.nozzle.SetBlendShapeWeight(0, 0)
 
-    self.throttle.localEulerAngles = Vector3(self.throttleRotMin, 0, 0)
 end
 
 function FalconEngine:Update()
@@ -43,9 +49,11 @@ function FalconEngine:Update()
             self:UpdateThrottle(self.avionics.wsInput)
         end
     
-        self.nozzlePos = Mathf.MoveTowards(self.nozzlePos, self.targetNozzlePos, self.nozzlePosPerSecond * Time.deltaTime)
-    
-        self.nozzle.SetBlendShapeWeight(0, self.nozzlePos)
+        if self.nozzle ~= nil then
+            self.nozzlePos = Mathf.MoveTowards(self.nozzlePos, self.targetNozzlePos, self.nozzlePosPerSecond * Time.deltaTime)
+        
+            self.nozzle.SetBlendShapeWeight(0, self.nozzlePos)
+        end
     end
 end
 
@@ -66,19 +74,23 @@ function FalconEngine:UpdateThrottle(input)
 end
 
 function FalconEngine:UpdateVisual()
-    self.throttle.localEulerAngles = Vector3(self:Lerp3Point(
-                                                            self.throttleRotMin,
-                                                            self.throttleRotAft,
-                                                            self.throttleRotMax,
-                                                            self.power),
-                                            0, 0)
-
-    if self.power < 5 then
-        self.targetNozzlePos = Mathf.Lerp(0, 100, self.power / 5)
-    elseif self.power <= 100 then
-        self.targetNozzlePos = 100
-    else
-        self.targetNozzlePos = Mathf.Lerp(100, 0, (self.power - 100) / 100)
+    if self.throttle ~= nil then
+        self.throttle.localEulerAngles = Vector3(self:Lerp3Point(
+                                                                self.throttleRotMin,
+                                                                self.throttleRotAft,
+                                                                self.throttleRotMax,
+                                                                self.power),
+                                                0, 0)
+    end
+    
+    if self.nozzle ~= nil then
+        if self.power < 5 then
+            self.targetNozzlePos = Mathf.Lerp(0, 100, self.power / 5)
+        elseif self.power <= 100 then
+            self.targetNozzlePos = 100
+        else
+            self.targetNozzlePos = Mathf.Lerp(100, 0, (self.power - 100) / 100)
+        end
     end
 end
 
