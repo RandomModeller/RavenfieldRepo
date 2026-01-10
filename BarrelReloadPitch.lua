@@ -1,10 +1,12 @@
-behaviour("BarrelReloadPitch") --v1.0.0
+behaviour("BarrelReloadPitch") --v1.1.0
 
 function BarrelReloadPitch:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
 
-    self.originalBearing = self.targets.originalBearing.transform
-    self.fakeBearing = self.targets.fakeBearing.transform
+    if self.targets.originalBearing ~= nil then
+        self.originalBearing = self.targets.originalBearing.transform
+        self.fakeBearing = self.targets.fakeBearing.transform
+    end
     self.originalPitch = self.targets.originalPitch.transform
     self.fakePitch = self.targets.fakePitch.transform
 
@@ -34,5 +36,7 @@ function BarrelReloadPitch:Update()
         self.fakePitch.localRotation = Quaternion.RotateTowards(self.fakePitch.localRotation, self.originalPitch.localRotation, self.rotationSpeed * Time.deltaTime)
     end
 
-    self.fakeBearing.rotation = self.originalBearing.rotation
+    if self.originalBearing ~= nil then
+        self.fakeBearing.rotation = self.originalBearing.rotation
+    end
 end
