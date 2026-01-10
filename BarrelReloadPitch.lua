@@ -1,4 +1,4 @@
-behaviour("BarrelReloadPitch") --v1.3.0
+behaviour("BarrelReloadPitch") --v1.3.1
 
 function BarrelReloadPitch:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -39,8 +39,10 @@ function BarrelReloadPitch:Update()
         self.finishReloadTime = Time.time + self.reloadDuration
     end
 
-    if Time.time > self.finishReloadTime then
+    if not isReloading then
         self.fakePitch.localRotation = Quaternion.RotateTowards(self.fakePitch.localRotation, self.originalPitch.localRotation, self.recoverRotationSpeed * Time.deltaTime)
+    elseif Time.time > self.finishReloadTime then
+        self.fakePitch.localRotation = Quaternion.RotateTowards(self.fakePitch.localRotation, self.originalPitch.localRotation, self.rotationSpeed * Time.deltaTime)
     else
         self.fakePitch.localRotation = Quaternion.RotateTowards(self.fakePitch.localRotation, self.reloadRotation, self.rotationSpeed * Time.deltaTime)
     end
