@@ -1,4 +1,4 @@
-behaviour("TrackSound") --v1.0.0
+behaviour("TrackSound") --v1.1.0
 
 function TrackSound:Start()
     self.audio = self.targets.audio.GetComponent(AudioSource)
@@ -18,15 +18,15 @@ function TrackSound:Start()
 end
 
 function TrackSound:Update()
+    local velocity = 0
+    
     if self.performanceMode then
-        self.audio.volume = Mathf.Min(self.gears.cacheVelocity / self.minSpeed, 1) * self.maxVolume
-
-        self.audio.pitch = Mathf.Min(self.gears.cacheVelocity / self.maxSpeed, 1) * self.maxPitch
+        velocity = self.gears.cacheVelocity
     else
         velocity = math.abs(self.vehicleTransform.worldToLocalMatrix.MultiplyVector(self.vehicleRigidbody.velocity).z * 3.6)
-     
-        self.audio.volume = Mathf.Min(velocity / self.minSpeed, 1) * self.maxVolume
-
-        self.audio.pitch = Mathf.Min(velocity / self.maxSpeed, 1) * self.maxPitch
     end
+
+    self.audio.volume = Mathf.Min(velocity / self.minSpeed, 1) * self.maxVolume
+
+    self.audio.pitch = Mathf.Min(velocity / self.maxSpeed, 1) * self.maxPitch
 end
