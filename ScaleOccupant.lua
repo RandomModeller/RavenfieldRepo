@@ -1,14 +1,16 @@
-behaviour("ScaleOccupant") -- v1.3.0
+behaviour("ScaleOccupant") -- v1.4.0
 
 function ScaleOccupant:Start()
     self.seat = self.targets.seat.GetComponent(Seat)
-    self.scale = self.gameObject.GetComponent(DataContainer).GetVector("scale")
-
-    self.lastOccupant = nil
-
-    -- self.isPlayer = false
-
+    self.dataContainer = self.gameObject.GetComponent(DataContainer)
     
+    self.scale = Vector3.zero
+    
+    if self.dataContainer.HasVector("scale") then
+        self.scale = self.dataContainer.GetVector("scale")
+    end
+    
+    self.lastOccupant = nil
 end
 
 function ScaleOccupant:Update()
@@ -62,4 +64,5 @@ function ScaleOccupant:FindPlayer()
     -- print(GameObject.Find("Actor Parent"))
     -- print(GameObject.Find("Actor Parent").transform.Find("Soldier"))
     -- print(GameObject.Find("Actor Parent").transform.Find("Soldier").Find("Armature"))
+
 end
