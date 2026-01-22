@@ -1,12 +1,12 @@
-behaviour("ActiveWithSeat")  --v1.0.0
+behaviour("ActiveWithSeat")  --v1.0.1
 
 function ActiveWithSeat:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
 
     self.seat = self.targets.seat.GetComponent(Seat)
 
-    self.activateWhenOccupied = self.dataContainer.GetStringArray("activateWhenOccupied")
-    self.deactivateWhenOccupied = self.dataContainer.GetStringArray("deactivateWhenOccupied")
+    self.activateWhenOccupied = self.dataContainer.GetGameObjectArray("activateWhenOccupied")
+    self.deactivateWhenOccupied = self.dataContainer.GetGameObjectArray("deactivateWhenOccupied")
     
     self.isOccupied = self.seat.isOccupied
 end
