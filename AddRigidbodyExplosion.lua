@@ -1,4 +1,4 @@
-behaviour("AddRigidbodyExplosion") --v1.1.0
+behaviour("AddRigidbodyExplosion") --v1.2.0
 
 function AddRigidbodyExplosion:Start()
     self.rigidbody = self.gameObject.GetComponent(Rigidbody)
@@ -17,5 +17,10 @@ function AddRigidbodyExplosion:Start()
         else
             self.rigidbody.AddExplosionForce(Mathf.Lerp(self.dataContainer.GetFloat("forceMin"), self.dataContainer.GetFloat("forceMax"), Random.Range(0, 1)), self.centre, 25)
         end
+
+        if self.targets.enableIfApplyForce ~= nil then
+            self.targets.enableIfApplyForce.SetActive(true)
+        end
     end
 end
+
