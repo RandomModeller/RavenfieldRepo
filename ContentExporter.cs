@@ -101,7 +101,7 @@ public class ContentExporter : EditorWindow {
 	[MenuItem("Ravenfield Tools/Set Test Map")]
 	public static void SetTestMap() {
 		ContentExporter window = ScriptableObject.CreateInstance<ContentExporter>();
-        window.position = new Rect(Screen.width / 2, Screen.height / 2, 800, 100);
+        window.position = new Rect(Screen.width / 2, Screen.height / 2, 800, 150);
         window.ShowPopup();
 	}
 
