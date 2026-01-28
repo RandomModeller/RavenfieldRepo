@@ -1,4 +1,4 @@
-behaviour("LightFollowParticle")
+behaviour("LightFollowParticle") --v1.0.0
 
 function LightFollowParticle:Start()
     self.light = self.targets.light.GetComponent(Light)
@@ -7,4 +7,5 @@ end
 
 function LightFollowParticle:Update()
     self.light.enabled = self.particle.isPlaying
+
 end
