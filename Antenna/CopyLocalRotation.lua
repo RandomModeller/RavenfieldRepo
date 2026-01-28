@@ -1,4 +1,4 @@
-behaviour("CopyLocalRotation")
+behaviour("CopyLocalRotation") --v1.0.0
 
 function CopyLocalRotation:Start()
     self.target = self.targets.target.transform
