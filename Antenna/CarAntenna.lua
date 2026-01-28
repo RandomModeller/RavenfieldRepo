@@ -34,4 +34,5 @@ function CarAntenna:FixedUpdate()
     self.model.localEulerAngles = Vector3(0, yRot, xRot)
 
     -- self.model.LookAt(self.mover.position)
+
 end
