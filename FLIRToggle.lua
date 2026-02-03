@@ -1,7 +1,11 @@
-behaviour("FLIRToggle") --v1.0.0
+behaviour("FLIRToggle") --v1.1.0
 
 function FLIRToggle:Start()
-    self.vehicle = self.targets.vehicleObject.GetComponent(Vehicle)
+    if self.targets.vehicleObject == nil then
+        self.seat = self.targets.seat.GetComponent(Seat)
+    else
+        self.vehicle = self.targets.vehicleObject.GetComponent(Vehicle)
+    end
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
     self.keybind = self.dataContainer.GetString("keybind")
 
@@ -16,7 +20,15 @@ function FLIRToggle:Start()
 end
 
 function FLIRToggle:Update()
-    if Input.GetKeyDown(self.keybind) and self.vehicle.playerIsInside and not PlayerCamera.tpCamera.enabled then
+    local flag1 = false
+
+    if self.seat == nil then
+        flag1 = self.seat.occupant == Player.actor
+    else
+        flag1 = self.vehicle.playerIsInside
+    end
+
+    if Input.GetKeyDown(self.keybind) and flag1 and not PlayerCamera.tpCamera.enabled then
         self.enabled = not self.enabled
 
         self.mainCamera.enabled = not self.enabled
