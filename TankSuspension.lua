@@ -1,4 +1,4 @@
-behaviour("TankSuspension") --v1.1.0
+behaviour("TankSuspension") --v1.1.1
 
 function TankSuspension:Start()
     self.pointA = self.targets.pointA.transform
@@ -24,6 +24,6 @@ function TankSuspension:Update()
         self.vertical.rotation = Quaternion.LookRotation(self.pointA.position - self.pointB.position, self.vehicleObject.up)
         self.rotate.rotation = Quaternion.LookRotation(self.vertical.position - self.rotate.position, self.vehicleObject.up)
     else
-        self.rotate.rotation = Quaternion.LookRotation(self.pointB.position - self.rotate.position, self.vehicleObject.up)
+        self.rotate.rotation = Quaternion.LookRotation(self.pointB.position - self.pointA.position, self.vehicleObject.up)
     end
 end
