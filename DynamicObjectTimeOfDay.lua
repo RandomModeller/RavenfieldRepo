@@ -1,4 +1,4 @@
-behaviour("DynamicObjectTimeOfDay") --v1.0.0
+behaviour("DynamicObjectTimeOfDay") --v1.0.1
 
 function DynamicObjectTimeOfDay:Start()
     self.vehicleObject = self.targets.vehicleObject.GetComponent(Vehicle)
@@ -34,7 +34,7 @@ function DynamicObjectTimeOfDay:Update()
         self.lastHour = currentHour
     end
     
-    if Input.GetKeyDown(self.keybind) then
+    if Input.GetKeyDown(self.keybind) and self.vehicleObject.playerIsInside then
         self:Toggle(not self.isTurnedOn)
     end
 end
