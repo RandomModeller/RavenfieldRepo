@@ -1,4 +1,4 @@
-behaviour("DynamicObjectTimeOfDay") --v1.0.2
+behaviour("DynamicObjectTimeOfDay") --v1.0.3
 
 function DynamicObjectTimeOfDay:Start()
     self.vehicleObject = self.targets.vehicleObject.GetComponent(Vehicle)
@@ -25,11 +25,15 @@ function DynamicObjectTimeOfDay:Start()
     if self.dataContainer.HasString("keybind") then
         self.keybind = self.dataContainer.GetString("keybind")
     end
-    
-    local dayNightMutator = GameObject.Find("DayAndNightCycleSystem(Clone)")
-	if dayNightMutator ~= nil then
-		self.timeText = cycle.transform.GetChild(0).transform.GetChild(0).transform.GetChild(0).gameObject.GetComponent(Text)
-        self.lastHour = tonumber(string.sub(self.cycletime.text, 1, 2))
+
+    if self.targets.parasite ~= nil then
+        self.parasite = self.targets.parasite
+    end
+
+    self.dayNightMutator = GameObject.Find("DayAndNightCycleSystem(Clone)")
+	if self.dayNightMutator ~= nil then
+        self.timeText = self.dayNightMutator.transform.GetChild(0).transform.GetChild(0).transform.GetChild(0).gameObject.GetComponent(Text)
+        self.last = tonumber(string.sub(self.timeText.text, 1, 2))
     end
     
     self:Toggle(GameManager.isNightMode)
@@ -38,18 +42,25 @@ function DynamicObjectTimeOfDay:Start()
 end
 
 function DynamicObjectTimeOfDay:Update()
-    local currentHour = nil
+    local flag = nil
 
-	if dayNightMutator ~= nil then
-        currentHour = tonumber(string.sub(self.cycletime.text, 1, 2)) 
-        if currentHour ~= self.lastHour then
-            if currentHour == self.nightTime then
-                self:Toggle(true)
-            elseif currentHour == self.dayTime then
-                self:Toggle(false)
-            end
-        
-            self.lastHour = currentHour
+    if self.parasite ~= nil then
+        flag = self.parasite.activeSelf
+    elseif self.dayNightMutator ~= nil then
+        local currentHour = tonumber(string.sub(self.timeText.text, 1, 2))
+
+        if currentHour == self.nightTime then
+            flag = true
+        elseif currentHour == self.dayTime then
+            flag = false
+        end
+    end
+
+    if flag ~= nil then
+        if flag ~= self.last then
+            self:Toggle(flag)
+
+            self.last = flag
         end
     end
     
