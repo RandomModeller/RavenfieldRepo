@@ -1,9 +1,7 @@
-behaviour("DynamicHydropneumatic") --v1.0.1
+behaviour("DynamicHydropneumatic") --v1.1.0
 
 function DynamicHydropneumatic:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
-
-    -- self.wheels = self.dataContainer.GetGameObjectArray("wheel")
 
     self.hull = self.targets.hull.transform
     self.fakePitch = self.targets.fakePitch.transform
@@ -18,7 +16,6 @@ function DynamicHydropneumatic:Start()
 
     if self.targets.audio ~= nil then
         self.audio = self.targets.audio.GetComponent(AudioSource)
-        self.last = self.originalPitch.localRotation
     end
 
 end
@@ -38,29 +35,28 @@ function DynamicHydropneumatic:Update()
         elseif pitch < self.pitchMinNormal then
             delta = self.pitchMinNormal - pitch
         end
-        -- print(delta)
 
-        targetRotation = Quaternion.AngleAxis(-Mathf.Round(delta * 1.5) / 1.5, Quaternion.AngleAxis(-self.hull.parent.localEulerAngles.y, Vector3.up) * self.originalBearing.right) -- round it to nearest multiple of 0.5 prevent jitter
+        targetRotation = Quaternion.AngleAxis(-delta, Quaternion.AngleAxis(-self.hull.parent.localEulerAngles.y, Vector3.up) * self.originalBearing.right)
     end
 
-    self.hull.localRotation = Quaternion.RotateTowards(self.hull.localRotation, targetRotation, self.speed * Time.deltaTime)
+    local move = Quaternion.Angle(self.hull.localRotation, targetRotation) > 0.5
+
+    if move then
+        self.hull.localRotation = Quaternion.RotateTowards(self.hull.localRotation, targetRotation, self.speed * Time.deltaTime)
+    end
 
     local rotation = self.fakePitch.localEulerAngles
     rotation.x = Mathf.Clamp(pitch, self.pitchMinNormal, self.pitchMaxNormal)
 
     self.originalPitch.localEulerAngles = rotation
 
-    -- if self.audio ~= nil then
-        -- local playAudio = Quaternion.Angle(self.last, self.hull.localRotation) > 0.00001
-
-        -- if self.audio.isPlaying ~= playAudio then
-        --     if playAudio then
-        --         self.audio:Play()
-        --     else
-        --         self.audio:Stop()
-        --     end
-        -- end
-
-    -- self.last = self.hull.localEulerAngles.x
-    -- end
+    if self.audio ~= nil then
+        if self.audio.isPlaying ~= move then
+            if move then
+                self.audio:Play()
+            else
+                self.audio:Stop()
+            end
+        end
+    end
 end
