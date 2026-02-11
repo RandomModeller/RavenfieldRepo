@@ -1,4 +1,4 @@
-behaviour("DynamicHydropneumatic") --v1.1.0
+behaviour("DynamicHydropneumatic") --v1.1.1
 
 function DynamicHydropneumatic:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -39,7 +39,7 @@ function DynamicHydropneumatic:Update()
         targetRotation = Quaternion.AngleAxis(-delta, Quaternion.AngleAxis(-self.hull.parent.localEulerAngles.y, Vector3.up) * self.originalBearing.right)
     end
 
-    local move = Quaternion.Angle(self.hull.localRotation, targetRotation) > 0.5
+    local move = Quaternion.Angle(self.hull.localRotation, targetRotation) > 0.75
 
     if move then
         self.hull.localRotation = Quaternion.RotateTowards(self.hull.localRotation, targetRotation, self.speed * Time.deltaTime)
@@ -60,3 +60,4 @@ function DynamicHydropneumatic:Update()
         end
     end
 end
+
