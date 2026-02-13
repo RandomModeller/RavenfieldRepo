@@ -1,6 +1,8 @@
-behaviour("DynamicHydropneumatic") --v1.1.1
+behaviour("DynamicHydropneumatic") --v1.1.2
 
 function DynamicHydropneumatic:Start()
+    self.step = 1
+
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
 
     self.hull = self.targets.hull.transform
@@ -9,18 +11,17 @@ function DynamicHydropneumatic:Start()
     self.originalBearing = self.targets.originalBearing.transform
 
     self.pitchMaxNormal = self.dataContainer.GetFloat("pitchMaxNormal")
-    self.pitchMaxExtra = self.dataContainer.GetFloat("pitchMaxExtra")
+    self.pitchMaxExtra = self.dataContainer.GetFloat("pitchMaxExtra") + self.step
     self.pitchMinNormal = self.dataContainer.GetFloat("pitchMinNormal")
-    self.pitchMinExtra = self.dataContainer.GetFloat("pitchMinExtra")
+    self.pitchMinExtra = self.dataContainer.GetFloat("pitchMinExtra") + self.step
     self.speed = self.dataContainer.GetFloat("speed")
 
     if self.targets.audio ~= nil then
         self.audio = self.targets.audio.GetComponent(AudioSource)
     end
-
 end
 
-function DynamicHydropneumatic:Update()
+function DynamicHydropneumatic:LateUpdate()
     local pitch = (self.fakePitch.localEulerAngles.x + 180) % 360 - 180
     local bearing = self.originalBearing.localEulerAngles.y
 
@@ -39,7 +40,7 @@ function DynamicHydropneumatic:Update()
         targetRotation = Quaternion.AngleAxis(-delta, Quaternion.AngleAxis(-self.hull.parent.localEulerAngles.y, Vector3.up) * self.originalBearing.right)
     end
 
-    local move = Quaternion.Angle(self.hull.localRotation, targetRotation) > 0.75
+    local move = Quaternion.Angle(self.hull.localRotation, targetRotation) > self.step
 
     if move then
         self.hull.localRotation = Quaternion.RotateTowards(self.hull.localRotation, targetRotation, self.speed * Time.deltaTime)
@@ -60,4 +61,3 @@ function DynamicHydropneumatic:Update()
         end
     end
 end
-
