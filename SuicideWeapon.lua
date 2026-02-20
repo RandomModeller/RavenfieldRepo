@@ -1,4 +1,4 @@
-behaviour("SuicideWeapon")
+behaviour("SuicideWeapon") --v1.0.0
 
 function SuicideWeapon:Start()
     if self.targets.weaponObject ~- nil then
@@ -12,4 +12,5 @@ end
 
 function SuicideWeapon:OnFire()
     self.weaponObject.user:Kill(self.weaponObject.user)
+
 end
