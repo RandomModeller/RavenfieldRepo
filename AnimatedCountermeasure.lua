@@ -1,4 +1,4 @@
-behaviour("AnimatedCountermeasure") --v1.0.0
+behaviour("AnimatedCountermeasure") --v1.0.1
 
 function AnimatedCountermeasure:Start()
     self.animator = self.targets.animator.GetComponent(Animator)
@@ -21,6 +21,7 @@ end
 function AnimatedCountermeasure:LateUpdate()
     local flag1 = true
     local flag2 = true
+    local flag3 = Input.GetKeybindButtonDown(KeyBinds.Countermeasures)
 
     if self.hands ~= nil then
         if self.seat.occupant ~= nil then
@@ -43,7 +44,7 @@ function AnimatedCountermeasure:LateUpdate()
         flag2 = self.particleSystem.isPlaying
     end
 
-    if Input.GetKeybindButtonDown(KeyBinds.Countermeasures) and flag1 and flag2 then
+    if flag1 and flag2 then
         self.animator.SetTrigger(self.COUNTERMEASURE_ANIMATION_HASH)
     end
 end
