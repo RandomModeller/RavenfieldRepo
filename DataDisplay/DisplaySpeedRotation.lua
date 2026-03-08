@@ -1,4 +1,4 @@
-behaviour("DisplaySpeedRotation")
+behaviour("DisplaySpeedRotation") --v1.1.0
 
 function DisplaySpeedRotation:Start()
     self.dataCon = self.gameObject.GetComponent(DataContainer)
@@ -7,8 +7,10 @@ function DisplaySpeedRotation:Start()
 
     if self.targets.avionics then
         self.avionics = self.targets.avionics.GetComponent(ScriptedBehaviour).self
-    else
+    elseif self.targets.radar then
         self.radar = self.targets.radar.GetComponent(ScriptedBehaviour).self
+    elseif self.targets.rigidbody then
+        self.rigidbody = self.targets.rigidbody.GetComponent(Rigidbody)
     end
 
     self.multiplier = self.dataCon.GetFloat("multiplier")
@@ -20,14 +22,17 @@ function DisplaySpeedRotation:Start()
 end
 
 function DisplaySpeedRotation:Update()
+    local speed = 0
+
     if self.avionics then
-        self.transform.localEulerAngles = self.vector * self.avionics.mach * self.multiplier + self.offset
+        speed = self.avionics.mach
     elseif self.radar then
         if self.radar.lockedVehicle then
-            self.transform.localEulerAngles = self.vector * self.radar.lockedVehicle.rigidbody.velocity.magnitude * self.multiplier + self.offset
-        else
-            self.transform.localEulerAngles = self.offset
+            speed = self.radar.lockedVehicle.rigidbody.velocity.magnitude
         end
-        return
+    elseif self.rigidbody then
+        speed = self.rigidbody.velocity.magnitude
     end
+
+    self.transform.localEulerAngles = self.vector * speed * self.multiplier + self.offset
 end
