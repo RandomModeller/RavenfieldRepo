@@ -1,7 +1,7 @@
-behaviour("CentreOfMassSetter") --v1.0.0
+behaviour("CentreOfMassSetter") --v1.0.1
 
 function CentreOfMassSetter:Start()
-    if self.targets.rigidbody ~- nil then
+    if self.targets.rigidbody ~= nil then
         self.rigidbody = self.targets.rigidbody.GetComponent(Rigidbody)
     else
         self.rigidbody = self.gameObject.GetComponent(Rigidbody)
