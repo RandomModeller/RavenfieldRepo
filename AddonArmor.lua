@@ -1,4 +1,4 @@
-behaviour("AddonArmor") --v1.0.0
+behaviour("AddonArmor") --v1.0.1
 
 function AddonArmor:Start()
     self.finished = false
@@ -24,5 +24,9 @@ function AddonArmor:Update()
 end
 
 function AddonArmor:OnTakeDamage(info)
-    self.vehicle.Damage(info.sourceActor, info.healthDamage)
+    local damage = info.healthDamage - self.destructible.health
+
+    if damage > 0 then
+        self.vehicle.Damage(info.sourceActor, damage)
+    end
 end
