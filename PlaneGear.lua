@@ -1,6 +1,7 @@
-behaviour("PlaneGear") --v1.0.0
+behaviour("PlaneGear") --v1.1.0
 
 function PlaneGear:Start()
+    self.dataContainer = self.gameObject.GetComponent(DataContainer)
     self.animator = self.targets.animator.GetComponent(Animator)
     self.vehicle = self.targets.vehicleObject.GetComponent(Vehicle)
     self.rigidbody = self.vehicle.rigidbody
@@ -11,6 +12,22 @@ function PlaneGear:Start()
     self.gearDown = true
 
     self.drag = 0.045
+    local loadKeybind = true
+
+    if self.dataContainer ~= nil then
+        if self.dataContainer.HasFloat("drag") then
+            self.drag = self.dataContainer.GetFloat("drag")
+        end
+        
+        if self.dataContainer.HasString("keybind") then
+            self.key = self.dataContainer.GetString("keybind")
+            loadKeybind = false
+        end
+
+        if self.dataContainer.HasBool("useMutatorKeybind") then
+            loadKeybind = self.dataContainer.HasBool("useMutatorKeybind")
+        end
+    end
 
     self.loadedKeybind = DebilFalconConfig_ConfigLoaded
     if self.loadedKeybind then
