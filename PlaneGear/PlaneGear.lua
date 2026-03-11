@@ -1,4 +1,4 @@
-behaviour("PlaneGear") --v1.1.0
+behaviour("PlaneGear") --v1.1.1
 
 function PlaneGear:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -7,26 +7,24 @@ function PlaneGear:Start()
     self.rigidbody = self.vehicle.rigidbody
     self.heightChecker = self.targets.heightChecker.GetComponent(ScriptedBehaviour).self
 
-    self.name = self.animator.StringToHash(self.gameObject.GetComponent(DataContainer).GetString("name"))
+    self.name = self.animator.StringToHash(self.dataContainer.GetString("name"))
 
     self.gearDown = true
 
     self.drag = 0.045
     local loadKeybind = true
 
-    if self.dataContainer ~= nil then
-        if self.dataContainer.HasFloat("drag") then
-            self.drag = self.dataContainer.GetFloat("drag")
-        end
-        
-        if self.dataContainer.HasString("keybind") then
-            self.key = self.dataContainer.GetString("keybind")
-            loadKeybind = false
-        end
+    if self.dataContainer.HasFloat("drag") then
+        self.drag = self.dataContainer.GetFloat("drag")
+    end
+    
+    if self.dataContainer.HasString("keybind") then
+        self.key = self.dataContainer.GetString("keybind")
+        loadKeybind = false
+    end
 
-        if self.dataContainer.HasBool("useMutatorKeybind") then
-            loadKeybind = self.dataContainer.HasBool("useMutatorKeybind")
-        end
+    if self.dataContainer.HasBool("useMutatorKeybind") then
+        loadKeybind = self.dataContainer.HasBool("useMutatorKeybind")
     end
 
     self.loadedKeybind = DebilFalconConfig_ConfigLoaded
