@@ -1,4 +1,4 @@
-behaviour("CoaxFireButton") -- v1.0.0
+behaviour("CoaxFireButton") --v1.1.0
 
 function CoaxFireButton:Start()
     self.coax = self.targets.coax.GetComponent(Weapon)
@@ -16,7 +16,9 @@ function CoaxFireButton:Update()
             self.audio.Play()
         end
 
-        self.coax.Shoot(false)
+        if self.coax.canFire then
+            self.coax.Shoot(true)
+        end
     end
 
     if Input.GetKeyUp(self.keybind) then
