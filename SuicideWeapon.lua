@@ -1,7 +1,7 @@
-behaviour("SuicideWeapon") --v1.0.0
+behaviour("SuicideWeapon") --v1.0.1
 
 function SuicideWeapon:Start()
-    if self.targets.weaponObject ~- nil then
+    if self.targets.weaponObject ~= nil then
         self.weaponObject = self.targets.weaponObject.GetComponent(Weapon)
     else
         self.weaponObject = self.gameObject.GetComponent(Weapon)
@@ -12,5 +12,4 @@ end
 
 function SuicideWeapon:OnFire()
     self.weaponObject.user:Kill(self.weaponObject.user)
-
 end
