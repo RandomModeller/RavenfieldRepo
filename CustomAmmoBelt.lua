@@ -1,4 +1,4 @@
-behaviour("CustomAmmoBelt") --v1.1.0
+behaviour("CustomAmmoBelt") --v1.1.1
 
 function CustomAmmoBelt:Start()
     self.weapon = self.gameObject.GetComponent(Weapon)
@@ -19,6 +19,7 @@ end
 function CustomAmmoBelt:onFire()
     if self.fireRandom then
         self.weapon.SetProjectilePrefab(self.belt[Mathf.Round(Random.Range(1, #self.belt))])
+        return
     end
 
     self.counter = (self.counter + 1) % #self.belt
