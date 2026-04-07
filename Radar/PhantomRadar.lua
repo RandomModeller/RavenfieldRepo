@@ -1,4 +1,4 @@
-behaviour("PhantomRadar") --v1.0.1
+behaviour("PhantomRadar") --v1.1.0
 
 function PhantomRadar:Start()
     self.vehicleObject = self.targets.vehicleObject.GetComponent(Vehicle)
@@ -63,7 +63,7 @@ function PhantomRadar:Start()
 
     self.lastTime = Time.time - 0.1
     self.lastPosition = Vector3.zero
-    self.lastRange = Vector3.zero
+    self.lastRange = 0
     self.targetRange = 0
 end
 
@@ -151,7 +151,14 @@ function PhantomRadar:Update()
                     self.blips[count].rectTransform.anchoredPosition = position
 
                     if self.isSTT then
+                        local direction = self.radarOrigin.InverseTransformPoint(position)
+
+                        self.targetAspect = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg
+
                         self.targetRange = b.magnitude
+                        self.closureSpeed = (self.lastRange - self.targetRange) / Time.deltaTime
+
+                        self.lastRange = self.targetRange
                     end
 
                     if (self.isSTT and self.velocityVectorRotateInSTT) or (not self.isSTT and self.velocityVectorRotateInTWS) then
