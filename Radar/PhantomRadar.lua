@@ -1,4 +1,4 @@
-behaviour("PhantomRadar") --v1.0.0
+behaviour("PhantomRadar") --v1.0.1
 
 function PhantomRadar:Start()
     self.vehicleObject = self.targets.vehicleObject.GetComponent(Vehicle)
@@ -85,19 +85,19 @@ function PhantomRadar:Update()
     --     blip:Hide()
     -- end
 
-    local isSTT = false
+    self.isSTT = false
 
     if self.targetTrackerTransform ~= nil then
-        isSTT = self.targetTrackerTransform.localPosition ~= self.lastTargetTrackerPosition
+        self.isSTT = self.targetTrackerTransform.localPosition ~= self.lastTargetTrackerPosition
 
         self.lastTargetTrackerPosition = self.targetTrackerTransform.localPosition
     end
 
-    if self.activateOnSTT ~= nil and self.activateOnSTT.activeSelf ~= isSTT then
-        self.activateOnSTT.SetActive(isSTT)
+    if self.activateOnSTT ~= nil and self.activateOnSTT.activeSelf ~= self.isSTT then
+        self.activateOnSTT.SetActive(self.isSTT)
     end
-    if self.deactivateOnSTT ~= nil and self.deactivateOnSTT.activeSelf ~= not isSTT then
-        self.deactivateOnSTT.SetActive(not isSTT)
+    if self.deactivateOnSTT ~= nil and self.deactivateOnSTT.activeSelf ~= not self.isSTT then
+        self.deactivateOnSTT.SetActive(not self.isSTT)
     end
 
     local targetPool = self.fcr.target
@@ -111,7 +111,7 @@ function PhantomRadar:Update()
         if vehicle.spotChanceMultiplier > 0 and vehicle.driver ~= nil then
             local calculate = true
 
-            if isSTT then
+            if self.isSTT then
                 if (self.targetTrackerTransform.position - vehicle.transform.position).sqrMagnitude > 600 then
                     calculate = false
                 end
@@ -146,15 +146,15 @@ function PhantomRadar:Update()
                         self.blips[count]:SetColor(self.foeColor)
                     end
 
-                    self.blips[count]:SetLockSymbol(isSTT)
+                    self.blips[count]:SetLockSymbol(self.isSTT)
 
                     self.blips[count].rectTransform.anchoredPosition = position
 
-                    if isSTT then
+                    if self.isSTT then
                         self.targetRange = b.magnitude
                     end
 
-                    if (isSTT and self.velocityVectorRotateInSTT) or (not isSTT and self.velocityVectorRotateInTWS) then
+                    if (self.isSTT and self.velocityVectorRotateInSTT) or (not self.isSTT and self.velocityVectorRotateInTWS) then
                         local relativeVelocity = Vector3.zero
                         local heading = 0
 
