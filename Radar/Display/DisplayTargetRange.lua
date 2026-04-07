@@ -1,4 +1,4 @@
-behaviour("DisplayTargetRange") --v1.1.0
+behaviour("DisplayTargetRange") --v1.2.0
 
 function DisplayTargetRange:Start()
     self.tgp = self.targets.tgp.GetComponent(ScriptedBehaviour).self
@@ -8,6 +8,11 @@ function DisplayTargetRange:Start()
     self.prefix = "T "
     if self.dataContainer.HasString("prefix") then
         self.prefix = self.dataContainer.GetString("prefix")
+    end
+
+    self.suffix = ""
+    if self.dataContainer.HasString("suffix") then
+        self.suffix = self.dataContainer.GetString("suffix")
     end
 
     self.displayOnlyWhenLock = false
@@ -20,7 +25,7 @@ end
 
 function DisplayTargetRange:Update()
     if (not self.displayOnlyWhenLock) or self.tgp.isSTT then
-        self.label.text = self.prefix .. tostring(Mathf.Round(self.tgp.targetRange * self.multiplier))
+        self.label.text = self.prefix .. tostring(Mathf.Round(self.tgp.targetRange * self.multiplier)) .. self.suffix
     else
         self.label.text = ""
     end
