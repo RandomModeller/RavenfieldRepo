@@ -1,13 +1,13 @@
-behaviour("SeatAffectReload") --v1.0.0
+behaviour("SeatAffectReload") --v1.0.1
 
 function SeatAffectReload:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
     
     self.weapon = self.targets.weapon.GetComponent(Weapon)
-    self.seats = self.dataContainer.GetGameObjectArray("seat")
+    self.seats = {}
 
-    for i, seat in pairs(self.seats) do
-        seat = seat.GetComponent(Seat)
+    for i, seat in pairs(self.dataContainer.GetGameObjectArray("seat")) do
+        self.seats[i] = seat.GetComponent(Seat)
     end
 
     self.baseReload = self.weapon.reloadTime
