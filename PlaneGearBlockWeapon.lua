@@ -1,4 +1,4 @@
-behaviour("PlaneGearBlockWeapon") --v1.0.0
+behaviour("PlaneGearBlockWeapon") --v1.1.0
 
 function PlaneGearBlockWeapon:Start()
     self.gearScript = self.targets.gearScript.GetComponent(ScriptedBehaviour).self
@@ -6,7 +6,7 @@ function PlaneGearBlockWeapon:Start()
 end
 
 function PlaneGearBlockWeapon:Update()
-    if self.gearScript.gearDown then
+    if self.gearScript.gearValue > 0 then
         self.weapon.LockWeapon()
     else
         self.weapon.UnlockWeapon()
