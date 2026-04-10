@@ -1,4 +1,4 @@
-behaviour("PlaneGear") --v1.1.1
+behaviour("PlaneGear") --v1.2.0
 
 function PlaneGear:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -10,6 +10,14 @@ function PlaneGear:Start()
     self.name = self.animator.StringToHash(self.dataContainer.GetString("name"))
 
     self.gearDown = true
+    self.gearValue = 1
+
+    self.gearDeployDuration = 2.5
+    if self.dataContainer.HasFloat("gearDeployDuration") then
+        self.gearDeployDuration = self.dataContainer.GetFloat("gearDeployDuration")
+    end
+
+    self.gearDeployDuration = 1 / self.gearDeployDuration
 
     self.drag = 0.045
     local loadKeybind = true
@@ -55,6 +63,8 @@ function PlaneGear:Update()
     else
         self.animator.SetBool(self.name, self.heightChecker.height <= 20)
     end
+
+    self.gearValue = Mathf.Clamp(self.gearValue + (self.gearDown and 1 else -1) * self.gearDeployDuration * Time.deltaTime, 0, 1)
 end
 
 function PlaneGear:LoadKeybind()
