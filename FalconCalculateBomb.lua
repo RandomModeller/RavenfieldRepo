@@ -1,4 +1,4 @@
-behaviour("FalconCalculateBomb") --v1.1.0
+behaviour("FalconCalculateBomb") --v1.1.1
 
 function FalconCalculateBomb:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -11,6 +11,7 @@ function FalconCalculateBomb:Start()
         if self.dataContainer.HasFloat("offset") then
             self.offset = self.dataContainer.GetFloat("offset")
         end
+    end
 end
 
 function FalconCalculateBomb:GetCCRPAngle(origin, target, velocity)
