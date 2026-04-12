@@ -1,9 +1,14 @@
-behaviour("SeatAffectReload") --v1.0.1
+behaviour("SeatAffectReload") --v1.1.0
 
 function SeatAffectReload:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
     
     self.weapon = self.targets.weapon.GetComponent(Weapon)
+    if self.targets.animator then
+        self.animator = self.targets.animator.GetComponent(Animator)
+        self.name = self.animator.StringToHash("reloadSpeedMultiplier")
+    end
+
     self.seats = {}
 
     for i, seat in pairs(self.dataContainer.GetGameObjectArray("seat")) do
@@ -24,4 +29,8 @@ function SeatAffectReload:Update()
     end
 
     self.weapon.reloadTime = self.baseReload + numberOfEmptySeat * self.secondsPerEmptySeat
+
+    if self.animator then
+        self.animator.SetFloat(self.name, (#self.seats - numberOfEmptySeat) / #self.seats)
+    end
 end
