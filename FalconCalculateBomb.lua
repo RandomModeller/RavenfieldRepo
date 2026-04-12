@@ -1,4 +1,4 @@
-behaviour("FalconCalculateBomb") --v1.0.0
+behaviour("FalconCalculateBomb") --v1.1.0
 
 function FalconCalculateBomb:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -6,7 +6,11 @@ function FalconCalculateBomb:Start()
     self.vehicleRigidbody = self.targets.vehicleObject.GetComponent(Rigidbody)
     -- self.fcr = self.targets.fcr.GetComponent(ScriptedBehaviour).self
 
-    self.offset = self.dataContainer.GetFloat("offset")
+    if self.dataContainer ~= nil then
+        self.offset = 0
+        if self.dataContainer.HasFloat("offset") then
+            self.offset = self.dataContainer.GetFloat("offset")
+        end
 end
 
 function FalconCalculateBomb:GetCCRPAngle(origin, target, velocity)
