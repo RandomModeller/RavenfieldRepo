@@ -1,11 +1,13 @@
-behaviour("PhantomAvionics") --v1.1.0
+behaviour("PhantomAvionics") --v1.2.0
 
 function PhantomAvionics:Start()
     self.rigidbody = self.targets.rigidbody.GetComponent(Rigidbody)
     self.vehicleTransform = self.rigidbody.gameObject.transform
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
 
-    self.wsInputReader = self.targets.wsInputReader.transform
+    if self.targets.wsInputReader then
+        self.wsInputReader = self.targets.wsInputReader.transform
+    end
 
     self.gForce = 1
     self.lastVel = self.rigidbody.velocity
@@ -30,7 +32,9 @@ end
 
 function PhantomAvionics:Update()
     if Time.deltaTime > 0 then
-        self.wsInput = (self.wsInputReader.localEulerAngles.x + 540) % 360 - 180
+        if self.wsInputReader then
+            self.wsInput = (self.wsInputReader.localEulerAngles.x + 540) % 360 - 180
+        end
         
         self.speed = self.rigidbody.velocity.magnitude
 
