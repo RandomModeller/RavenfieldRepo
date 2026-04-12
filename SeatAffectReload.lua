@@ -1,4 +1,4 @@
-behaviour("SeatAffectReload") --v1.1.0
+behaviour("SeatAffectReload") --v1.1.1
 
 function SeatAffectReload:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -31,6 +31,6 @@ function SeatAffectReload:Update()
     self.weapon.reloadTime = self.baseReload + numberOfEmptySeat * self.secondsPerEmptySeat
 
     if self.animator then
-        self.animator.SetFloat(self.name, (#self.seats - numberOfEmptySeat) / #self.seats)
+        self.animator.SetFloat(self.name, self.baseReload / self.weapon.reloadTime)
     end
 end
