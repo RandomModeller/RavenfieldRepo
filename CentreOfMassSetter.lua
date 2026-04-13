@@ -1,4 +1,4 @@
-behaviour("CentreOfMassSetter") --v1.0.4d
+behaviour("CentreOfMassSetter") --v1.0.4
 
 function CentreOfMassSetter:Start()
     if self.targets.rigidbody then
@@ -17,6 +17,5 @@ function CentreOfMassSetter:FixedUpdate()
 
     if self.targets.debugCube then
         self.targets.debugCube.transform.localPosition = self.rigidbody.centerOfMass
-        -- print("Moved the cube to " .. tostring(self.rigidbody.centerOfMass))
     end
 end
