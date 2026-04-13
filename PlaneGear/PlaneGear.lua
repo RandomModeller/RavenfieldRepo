@@ -1,4 +1,4 @@
-behaviour("PlaneGear") --v1.2.1
+behaviour("PlaneGear") --v1.2.2
 
 function PlaneGear:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -61,7 +61,7 @@ function PlaneGear:Update()
             end
         end
     else
-        self.animator.SetBool(self.name, self.heightChecker.height <= 20)
+        self.animator.SetBool(self.name, self.heightChecker.height <= 20 and self.rigidbody.velocity.sqrMagnitude <= 5300)
     end
 
     self.gearValue = Mathf.Clamp(self.gearValue + (self.gearDown and 1 or -1) * self.gearDeployDuration * Time.deltaTime, 0, 1)
