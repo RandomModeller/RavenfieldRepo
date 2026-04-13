@@ -1,16 +1,7 @@
-behaviour("CentreOfMassSetter") --v1.0.2d
+behaviour("CentreOfMassSetter") --v1.0.3d
 
-function CentreOfMassSetter:Update()
-    if self.finished then
-        return
-    end
-
-    self:BakeRigidbody()
-    self.finished = true
-end
-
-function CentreOfMassSetter:BakeRigidbody()
-    if self.targets.rigidbody ~= nil then
+function CentreOfMassSetter:Awake()
+    if self.targets.rigidbody then
         self.rigidbody = self.targets.rigidbody.GetComponent(Rigidbody)
     else
         self.rigidbody = self.gameObject.GetComponent(Rigidbody)
@@ -22,6 +13,6 @@ function CentreOfMassSetter:BakeRigidbody()
 
     if self.targets.debugCube then
         self.targets.debugCube.transform.localPosition = self.rigidbody.centerOfMass
-        print("moved the cube to " .. tostring(self.rigidbody.centerOfMass))
+        print("Moved the cube to " .. tostring(self.rigidbody.centerOfMass))
     end
 end
