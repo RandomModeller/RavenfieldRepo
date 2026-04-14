@@ -1,4 +1,4 @@
-behaviour("SharedAmmoPoolThree") --v1.0.0
+behaviour("SharedAmmoPoolThree") --v1.0.1
 
 function SharedAmmoPoolThree:Start()
     self.mainWep = self.targets.main.GetComponent(Weapon)
@@ -31,8 +31,8 @@ function SharedAmmoPoolThree:Update()
             self.secondaryWep.spareAmmo = self.mainWep.spareAmmo
         end
         if activeWeapon == self.tertiaryWep then
-            self.secondaryWep.ammo = self.secondaryWep.ammo
-            self.secondaryWep.spareAmmo = self.secondaryWep.spareAmmo
+            self.tertiaryWep.ammo = self.secondaryWep.ammo
+            self.tertiaryWep.spareAmmo = self.secondaryWep.spareAmmo
         end
     end
 end
