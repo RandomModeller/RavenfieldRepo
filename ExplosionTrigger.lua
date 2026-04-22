@@ -1,4 +1,4 @@
-behaviour("ExplosionTrigger") --v1.0.0
+behaviour("ExplosionTrigger") --v1.0.1
 
 function ExplosionTrigger:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -11,7 +11,7 @@ end
 
 function ExplosionTrigger:Update()
     local ray = Ray(self.transform.position, self.transform.forward)
-    local raycast = Physics.Raycast(ray, self.range, RaycastTarget.Opaque)
+    local raycast = Physics.Raycast(ray, self.range, RaycastTarget.ProjectileHit)
     if raycast ~= nil then
         self.vehicle.Damage(self.vehicle.driver, self.vehicle.health)
     end
