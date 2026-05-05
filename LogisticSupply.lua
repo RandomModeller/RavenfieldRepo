@@ -1,4 +1,4 @@
-behaviour("LogisticSupply") --v1.1.0
+behaviour("LogisticSupply") --v1.1.1
 
 function LogisticSupply:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -10,9 +10,9 @@ function LogisticSupply:Start()
     self.reloadTime = self.dataContainer.GetFloat("reloadTime")
     self.spawnOffset = self.dataContainer.GetVector("spawnOffset")
     self.dropOnPlayerExit = true
-    if self.dataContainer.HasBool("dropOnPlayerExit")
+    if self.dataContainer.HasBool("dropOnPlayerExit") then
         self.dropOnPlayerExit = self.dataContainer.GetBool("dropOnPlayerExit")
-end
+    end
     self.logisticBox = self.targets.logisticBox
 
     self.nextDeployTime = 0
