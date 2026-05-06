@@ -9,7 +9,7 @@ function AnimatedPassengerDoor:Start()
 end
 
 function AnimatedPassengerDoor:Update()
-    local isFull = self.vehicle.GetEmptySeat() == nil
+    local isFull = self.vehicle.GetEmptySeat(false) == nil
     local isLow = self.heightChecker <= 8
     local isSlow = self.vehicle.rigidbody.velocity.sqrMagnitude <= 200
     local isCloseToLZ = false
@@ -27,7 +27,6 @@ function AnimatedPassengerDoor:Update()
         end
     end
     
-
     local doorOpen = (isLow and not isFull and isSlow) or (isCloseToLZ) or (isPickingUp)
 
     self.animator.SetBool(self.name, doorOpen)
