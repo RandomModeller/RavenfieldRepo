@@ -1,4 +1,4 @@
-behaviour("SeatAffectMagazineSize") --v1.0.0
+behaviour("SeatAffectMagazineSize") --v1.0.1
 
 function SeatAffectMagazineSize:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -12,7 +12,7 @@ function SeatAffectMagazineSize:Start()
     end
 
     self.baseMaxAmmo = self.weapon.maxAmmo
-    self.ammoPerOccupiedSeat = self.dataContainer.GetFloat("ammoPerOccupiedSeat")
+    self.ammoPerOccupiedSeat = self.dataContainer.GetInt("ammoPerOccupiedSeat")
 end
 
 function SeatAffectMagazineSize:Update()
