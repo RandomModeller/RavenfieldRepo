@@ -1,4 +1,4 @@
-behaviour("MeleeProjectile") --v1.0.0
+behaviour("MeleeProjectile") --v1.0.1
 
 function MeleeProjectile:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -22,6 +22,10 @@ function MeleeProjectile:Update()
     end
 
     if valid and Random.Range(0, 1) <= self.chance then
-        GameObject.Instantiate(self.projectile, self.weapon.currentMuzzleTransform.position, self.weapon.currentMuzzleTransform.rotation)
+        local projectile = GameObject.Instantiate(self.projectile, self.weapon.currentMuzzleTransform.position, self.weapon.currentMuzzleTransform.rotation)
+
+        projectile = projectile.GetComponent(Projectile)
+
+        projectile.killCredit = self.weapon.killCredit
     end
 end
