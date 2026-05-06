@@ -1,4 +1,4 @@
-behaviour("AnimatedPassengerDoor") --v1.1.1
+behaviour("AnimatedPassengerDoor") --v1.1.2
 
 function AnimatedPassengerDoor:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -39,7 +39,7 @@ function AnimatedPassengerDoor:Update()
 
     if self.keybind then
         if Input.GetKey(self.keybind) and self.vehicle.playerIsInside then
-            doorOpen = not doorOpen
+            doorOpen = not self.animator.GetBool(self.name)
         end
     end
 
