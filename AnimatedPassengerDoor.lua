@@ -1,4 +1,4 @@
-behaviour("AnimatedPassengerDoor") --v1.1.0
+behaviour("AnimatedPassengerDoor") --v1.1.1
 
 function AnimatedPassengerDoor:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -17,7 +17,7 @@ end
 
 function AnimatedPassengerDoor:Update()
     local isFull = self.vehicle.GetEmptySeat(false) == nil
-    local isLow = self.heightChecker <= 8
+    local isLow = self.heightChecker.height <= 8
     local isSlow = self.vehicle.rigidbody.velocity.sqrMagnitude <= 200
     local isCloseToLZ = false
     local isPickingUp = false
