@@ -1,11 +1,18 @@
-behaviour("AnimatedPassengerDoor") --v1.0.1
+behaviour("AnimatedPassengerDoor") --v1.1.0
 
 function AnimatedPassengerDoor:Start()
+    self.dataContainer = self.gameObject.GetComponent(DataContainer)
     self.animator = self.targets.animator.GetComponent(Animator)
     self.heightChecker = self.targets.heightChecker.GetComponent(ScriptedBehaviour).self
     self.vehicle = self.targets.vehicle.GetComponent(Vehicle)
 
-    self.name = self.animator.StringToHash(self.gameObject.GetComponent(DataContainer).GetString("name"))
+    self.name = self.animator.StringToHash(self.dataContainer.GetString("name"))
+    self.keybind = ""
+    if self.dataContainer.HasString("keybind") then
+        self.keybind = self.dataContainer.GetString("keybind")
+    end
+
+    self.lastAutoValue = 2
 end
 
 function AnimatedPassengerDoor:Update()
@@ -28,6 +35,16 @@ function AnimatedPassengerDoor:Update()
     end
     
     local doorOpen = (isLow and not isFull and isSlow) or (isCloseToLZ) or (isPickingUp)
+    local autoValue = doorOpen
 
-    self.animator.SetBool(self.name, doorOpen)
+    if self.keybind then
+        if Input.GetKey(self.keybind) and self.vehicle.playerIsInside then
+            doorOpen = not doorOpen
+        end
+    end
+
+    if doorOpen ~= self.lastAutoValue then
+        self.animator.SetBool(self.name, doorOpen)
+        self.lastAutoValue = autoValue
+    end
 end
