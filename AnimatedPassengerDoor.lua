@@ -1,4 +1,4 @@
-behaviour("AnimatedPassengerDoor") --v1.1.2
+behaviour("AnimatedPassengerDoor") --v1.1.3
 
 function AnimatedPassengerDoor:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -35,16 +35,15 @@ function AnimatedPassengerDoor:Update()
     end
     
     local doorOpen = (isLow and not isFull and isSlow) or (isCloseToLZ) or (isPickingUp)
-    local autoValue = doorOpen
 
     if self.keybind then
-        if Input.GetKey(self.keybind) and self.vehicle.playerIsInside then
-            doorOpen = not self.animator.GetBool(self.name)
+        if Input.GetKeyDown(self.keybind) and self.vehicle.playerIsInside then
+            self.animator.SetBool(self.name, not self.animator.GetBool(self.name))
         end
     end
 
     if doorOpen ~= self.lastAutoValue then
         self.animator.SetBool(self.name, doorOpen)
-        self.lastAutoValue = autoValue
+        self.lastAutoValue = doorOpen
     end
 end
