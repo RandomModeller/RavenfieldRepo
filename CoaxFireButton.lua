@@ -1,4 +1,4 @@
-behaviour("CoaxFireButton") --v1.1.0
+behaviour("CoaxFireButton") --v1.2.0
 
 function CoaxFireButton:Start()
     self.coax = self.targets.coax.GetComponent(Weapon)
@@ -11,17 +11,23 @@ function CoaxFireButton:Start()
 end
 
 function CoaxFireButton:Update()
-    if Input.GetKey(self.keybind) and self.seat.occupant == Player.actor then
-        if Input.GetKeyDown(self.keybind) and self.coax.canFire then
-            self.audio.Play()
+    if self.seat.activeWeapon == self.coax then
+        if Input.GetKey(self.keybind) then
+            self.coax.Shoot(false)
+        end
+    else
+        if Input.GetKey(self.keybind) and self.seat.occupant == Player.actor then
+            if Input.GetKeyDown(self.keybind) and self.coax.canFire then
+                self.audio.Play()
+            end
+
+            if self.coax.canFire then
+                self.coax.Shoot(true)
+            end
         end
 
-        if self.coax.canFire then
-            self.coax.Shoot(true)
+        if Input.GetKeyUp(self.keybind) then
+            self.audio.Stop()
         end
-    end
-
-    if Input.GetKeyUp(self.keybind) then
-        self.audio.Stop()
     end
 end
