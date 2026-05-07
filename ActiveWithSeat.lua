@@ -1,17 +1,41 @@
-behaviour("ActiveWithSeat")  --v1.1.0
+behaviour("ActiveWithSeat")  --v1.2.0
 
 function ActiveWithSeat:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
 
     self.seat = self.targets.seat.GetComponent(Seat)
 
-    self.activateWhenOccupied = self.dataContainer.GetGameObjectArray("activateWhenOccupied")
-    self.deactivateWhenOccupied = self.dataContainer.GetGameObjectArray("deactivateWhenOccupied")
+    self.activateWhenOccupied = {}
+    self.deactivateWhenOccupied = {}
     self.fakeActors = {}
-    if self.dataContainer.HasObject("fakeActors1") then
-        self.fakeActors = self.dataContainer.GetGameObjectArray("fakeActors")
-    end
     
+    if self.dataContainer.HasObject("activateWhenOccupied") then
+        self.activateWhenOccupied[1] = self.dataContainer.GetGameObject("activateWhenOccupied")
+        self.activateWhenOccupied[1].SetActive(self.seat.isOccupied)
+    end
+    for i, obj in pairs(self.dataContainer.GetGameObjectArray("activateWhenOccupied")) do
+        self.activateWhenOccupied[#self.activateWhenOccupied + 1] = obj
+        self.activateWhenOccupied[i].SetActive(self.seat.isOccupied)
+    end
+
+    if self.dataContainer.HasObject("deactivateWhenOccupied") then
+        self.deactivateWhenOccupied[1] = self.dataContainer.GetGameObject("deactivateWhenOccupied")
+        self.deactivateWhenOccupied[1].SetActive(not self.seat.isOccupied)
+    end
+    for i, obj in pairs(self.dataContainer.GetGameObjectArray("deactivateWhenOccupied")) do
+        self.deactivateWhenOccupied[#self.deactivateWhenOccupied + 1] = obj
+        self.deactivateWhenOccupied[i].SetActive(not self.seat.isOccupied)
+    end
+
+    if self.dataContainer.HasObject("fakeActors") then
+        self.fakeActors[1] = self.dataContainer.GetGameObject("fakeActors")
+        self.fakeActors[1].SetActive(self.seat.isOccupied)
+    end
+    for i, obj in pairs(self.dataContainer.GetGameObjectArray("fakeActors")) do
+        self.fakeActors[#self.fakeActors + 1] = obj
+        self.fakeActors[i].SetActive(self.seat.isOccupied)
+    end
+
     self.isOccupied = self.seat.isOccupied
 end
 
