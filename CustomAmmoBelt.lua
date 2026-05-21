@@ -1,10 +1,10 @@
-behaviour("CustomAmmoBelt") --v1.1.1
+behaviour("CustomAmmoBelt") --v1.1.2
 
 function CustomAmmoBelt:Start()
     self.weapon = self.gameObject.GetComponent(Weapon)
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
 
-    self.weapon.onSpawnProjectiles.AddListener(self, "onFire")
+    self.weapon.onFire.AddListener(self, "onFire")
 
     self.belt = self.dataContainer.GetGameObjectArray("projectile")
 
