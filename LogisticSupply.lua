@@ -1,4 +1,4 @@
-behaviour("LogisticSupply") --v1.2.1
+behaviour("LogisticSupply") --v1.2.2
 
 function LogisticSupply:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -36,7 +36,7 @@ function LogisticSupply:Update()
             end
         end
 
-        local flag1 = (driverIsIn and self.lastDriverIsIn) and (not hasPassengers and self.lastHasPassengers) and not playerIsDriver
+        local flag1 = (driverIsIn and self.lastDriverIsIn) and (not hasPassengers and self.lastHasPassengers) and ((not playerIsDriver) and self.weapon ~= nil)
 
         local flag2 = not playerIsInside and self.lastPlayerIsInside and self.dropOnPlayerExit
 
