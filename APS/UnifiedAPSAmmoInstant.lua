@@ -1,4 +1,4 @@
-behaviour("UnifiedAPSAmmoInstant") --v1.2.2
+behaviour("UnifiedAPSAmmoInstant") --v1.2.3
 
 function UnifiedAPSAmmoInstant:Start()
     self.vehicle = self.targets.vehicleObject.GetComponent(Vehicle)
@@ -253,7 +253,7 @@ function UnifiedAPSAmmoInstant:Update()
             local destroyedProjPositions = {}
 
             for i, proj in pairs(self.projectilesWatched) do -- get all projectile in range
-                if proj ~= nil then
+                if proj ~= nil and proj.isActive then
                     local projectileDistance = (self.vehicle.transform.position - proj.transform.position).sqrMagnitude
 
                     if projectileDistance <= self.range and projectileDistance >= self.minRange then
