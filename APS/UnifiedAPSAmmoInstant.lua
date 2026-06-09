@@ -1,4 +1,4 @@
-behaviour("UnifiedAPSAmmoInstant") --v1.1.0
+behaviour("UnifiedAPSAmmoInstant") --v1.2.0
 
 function UnifiedAPSAmmoInstant:Start()
     self.vehicle = self.targets.vehicleObject.GetComponent(Vehicle)
@@ -24,6 +24,10 @@ function UnifiedAPSAmmoInstant:Start()
     self.loadDuration = self.dataContainer.GetFloat("loadDuration")
     -- load keybind
     self.loadKeybind = self.dataContainer.GetString("loadKeybind")
+    self.maximumReloadTimes = 0
+    if self.dataContainer.HasFloat("maximumReloadTimes") then
+        self.maximumReloadTimes = self.dataContainer.GetFloat("maximumReloadTimes")
+    end
     -- APS cone radius
     self.arcRadius = self.dataContainer.GetFloat("apsGimbal")
     self.arcRadiusCosSqr = Mathf.Cos(self.arcRadius * Mathf.Deg2Rad)
@@ -124,6 +128,10 @@ function UnifiedAPSAmmoInstant:onStartLoad()
         return
     end
 
+    if self.maximumReloadTimes <= 0 then
+        return
+    end
+
     self.script.StartCoroutine("LoadAPS")
 end
 
@@ -180,6 +188,8 @@ function UnifiedAPSAmmoInstant:LoadAPS()
     self.accelComponent.acceleration = self.accel
     self.accelComponent.baseTurnTorque = self.turnTorque
     self.isLoading = false
+
+    self.maximumReloadTimes = self.maximumReloadTimes - 1
 end
 
 function UnifiedAPSAmmoInstant:onProjectileSpawned(projectile)
