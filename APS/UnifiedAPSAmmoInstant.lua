@@ -1,4 +1,4 @@
-behaviour("UnifiedAPSAmmoInstant") --v1.0.0
+behaviour("UnifiedAPSAmmoInstant") --v1.1.0
 
 function UnifiedAPSAmmoInstant:Start()
     self.vehicle = self.targets.vehicleObject.GetComponent(Vehicle)
@@ -38,6 +38,10 @@ function UnifiedAPSAmmoInstant:Start()
     end
     -- APS range
     self.range = self.dataContainer.GetFloat("apsRange") ^ 2
+    self.minRange = 0
+    if self.dataContainer.HasFloat("minRange") then
+        self.minRange = self.dataContainer.GetFloat("minApsRange") ^ 2
+    end
     self.blastRadius = self.dataContainer.GetFloat("blastRadius") ^ 2
     -- APS ammo
     self.allAps = {}
@@ -242,7 +246,7 @@ function UnifiedAPSAmmoInstant:Update()
                 if proj ~= nil then
                     local projectileDistance = (self.vehicle.transform.position - proj.transform.position).sqrMagnitude
 
-                    if projectileDistance <= self.range then
+                    if projectileDistance <= self.range and projectileDistance >= self.minRange then
                         local projPosition = proj.transform.position
                         local projDestroyed = false
 
