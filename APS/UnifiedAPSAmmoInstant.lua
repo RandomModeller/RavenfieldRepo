@@ -1,4 +1,4 @@
-behaviour("UnifiedAPSAmmoInstant") --v1.2.1
+behaviour("UnifiedAPSAmmoInstant") --v1.2.2
 
 function UnifiedAPSAmmoInstant:Start()
     self.vehicle = self.targets.vehicleObject.GetComponent(Vehicle)
@@ -24,7 +24,7 @@ function UnifiedAPSAmmoInstant:Start()
     self.loadDuration = self.dataContainer.GetFloat("loadDuration")
     -- load keybind
     self.loadKeybind = self.dataContainer.GetString("loadKeybind")
-    self.maximumReloadTimes = 0
+    self.maximumReloadTimes = 99999
     if self.dataContainer.HasInt("maximumReloadTimes") then
         self.maximumReloadTimes = self.dataContainer.GetInt("maximumReloadTimes")
     end
