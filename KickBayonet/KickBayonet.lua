@@ -1,4 +1,4 @@
-behaviour("KickBayonet") --v2.0.0
+behaviour("KickBayonet") --v2.1.0
 
 function KickBayonet:Start()
     if self.weapon == nil then
@@ -37,6 +37,7 @@ function KickBayonet:Start()
         if self.requiresEquip then
             self.equipKeybind = self.dataContainer.GetString("equipKeybind")
             self.animatorParameter = self.animator.StringToHash(self.dataContainer.GetString("isEquippedParameterName"))
+            self.switchParameter = self.animator.StringToHash(self.dataContainer.GetString("switchParameterName"))
 
             self.isEquipped = self.dataContainer.GetBool("isEquipped")
             self.animator.SetBool(self.animatorParameter, self.isEquipped)
@@ -56,6 +57,7 @@ function KickBayonet:Update()
         if Input.GetKeyDown(self.equipKeybind) then
             self.isEquipped = not self.isEquipped
             self.animator.SetBool(self.animatorParameter, self.isEquipped)
+            self.animator.SetTrigger(self.switchParameter)
 
             Player.allowKick = not self.isEquipped
         end
