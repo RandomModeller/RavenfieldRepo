@@ -1,4 +1,4 @@
-behaviour("KickBayonet") --v2.1.0
+behaviour("KickBayonet") --v2.1.1
 
 function KickBayonet:Start()
     if self.weapon == nil then
@@ -43,6 +43,8 @@ function KickBayonet:Start()
             self.animator.SetBool(self.animatorParameter, self.isEquipped)
         end
     end
+    
+    Player.allowKick = not self.isEquipped
 
     self.nextKick = Time.time
     self.kickTime = 0
