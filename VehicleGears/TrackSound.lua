@@ -1,10 +1,11 @@
-behaviour("TrackSound") --v1.2.0
+behaviour("TrackSound") --v1.3.0
 
 function TrackSound:Start()
     self.audio = self.targets.audio.GetComponent(AudioSource)
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
 
     self.performanceMode = self.dataContainer.GetBool("performanceMode")
+    self.gears = nil
 
     if self.performanceMode then
         self.gears = self.targets.gears.GetComponent(ScriptedBehaviour).self
@@ -28,8 +29,17 @@ function TrackSound:Update()
         velocity = math.abs(self.vehicleTransform.worldToLocalMatrix.MultiplyVector(self.vehicleRigidbody.velocity).z * 3.6)
     end
 
-    self.audio.volume = Mathf.Min(velocity / self.minSpeed, 1) * self.maxVolume
+    if velocity < self.minSpeed then
+        if self.audio.isPlaying then
+            self.audio.Stop()
+        end
+    else
+        if not self.audio.isPlaying then
+            self.audio.Play()
+        end
 
-    self.audio.pitch = Mathf.Min(velocity / self.maxSpeed, 1) * self.maxPitch
+        self.audio.volume = Mathf.Min(velocity / self.minSpeed, 1) * self.maxVolume
+
+        self.audio.pitch = Mathf.Min(velocity / self.maxSpeed, 1) * self.maxPitch
+    end
 end
-
