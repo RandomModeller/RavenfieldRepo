@@ -1,4 +1,4 @@
-behaviour("KickBayonet") --v2.1.1
+behaviour("KickBayonet") --v2.2.0
 
 function KickBayonet:Start()
     if self.weapon == nil then
@@ -36,6 +36,10 @@ function KickBayonet:Start()
 
         if self.requiresEquip then
             self.equipKeybind = self.dataContainer.GetString("equipKeybind")
+            self.equipDuration = -1
+            if self.dataContainer.HasFloat("equipDuration") then
+                self.equipDuration = self.dataContainer.GetFloat("equipDuration")
+            end
             self.animatorParameter = self.animator.StringToHash(self.dataContainer.GetString("isEquippedParameterName"))
             self.switchParameter = self.animator.StringToHash(self.dataContainer.GetString("switchParameterName"))
 
@@ -48,6 +52,7 @@ function KickBayonet:Start()
 
     self.nextKick = Time.time
     self.kickTime = 0
+    self.finishEquipTime = -1
 end
 
 function KickBayonet:Update()
@@ -62,7 +67,19 @@ function KickBayonet:Update()
             self.animator.SetTrigger(self.switchParameter)
 
             Player.allowKick = not self.isEquipped
+
+            if self.equipDuration > 0 then
+                self.finishEquipTime = Time.time + self.equipDuration
+            end
         end
+    end
+
+    if self.finishEquipTime > 0 then
+        self.weapon:LockWeapon()
+    end
+    if Time.time >= self.finishEquipTime then
+        self.weapon:UnlockWeapon()
+        self.finishEquipTime = -1
     end
 
     if self.isEquipped and Input.GetKeyBindButtonDown(KeyBinds.Kick) and not self.weapon.isReloading and self.weapon.isUnholstered and Time.time >= self.nextKick and (self.allowWhenAim or not self.weapon.isAiming) and (self.allowWhenProne or not (Player.actor.stance == Stance.Prone)) then
