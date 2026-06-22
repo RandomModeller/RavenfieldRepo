@@ -1,4 +1,4 @@
-behaviour("SeatAffectReload") --v1.1.1
+behaviour("SeatAffectReload") --v1.2.0
 
 function SeatAffectReload:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -7,6 +7,10 @@ function SeatAffectReload:Start()
     if self.targets.animator then
         self.animator = self.targets.animator.GetComponent(Animator)
         self.name = self.animator.StringToHash("reloadSpeedMultiplier")
+    end
+    if self.targets.reloadSound then
+        self.reloadSound = self.targets.reloadSound.GetComponent(AudioSource)
+        self.reloadSounds = self.dataContainer.GetAudioClipArray("reloadSound")
     end
 
     self.seats = {}
@@ -32,5 +36,9 @@ function SeatAffectReload:Update()
 
     if self.animator then
         self.animator.SetFloat(self.name, self.baseReload / self.weapon.reloadTime)
+    end
+
+    if self.reloadSound then
+        self.reloadSound.clip = self.reloadSounds[numberOfEmptySeat + 1]
     end
 end
