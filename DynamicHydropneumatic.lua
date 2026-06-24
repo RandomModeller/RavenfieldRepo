@@ -1,4 +1,4 @@
-behaviour("DynamicHydropneumatic") --v1.1.2
+behaviour("DynamicHydropneumatic") --v1.1.3
 
 function DynamicHydropneumatic:Start()
     self.step = 1
@@ -37,7 +37,7 @@ function DynamicHydropneumatic:LateUpdate()
             delta = self.pitchMinNormal - pitch
         end
 
-        targetRotation = Quaternion.AngleAxis(-delta, Quaternion.AngleAxis(-self.hull.parent.localEulerAngles.y, Vector3.up) * self.originalBearing.right)
+        targetRotation = Quaternion.AngleAxis(-delta, Quaternion.AngleAxis(-self.hull.root.localEulerAngles.y, Vector3.up) * self.originalBearing.right)
     end
 
     local move = Quaternion.Angle(self.hull.localRotation, targetRotation) > self.step
