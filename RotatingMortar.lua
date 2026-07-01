@@ -1,4 +1,4 @@
-behaviour("RotatingMortar") --v2.0.0
+behaviour("RotatingMortar") --v2.1.0
 
 function RotatingMortar:Start()
     self.seat = self.targets.seat.GetComponent(Seat)
@@ -27,6 +27,8 @@ function RotatingMortar:LateUpdate()
         elseif self.seat.occupant.aiController.currentAttackTarget ~= nil then
             bearingTarget = self.seat.occupant.aiController.currentAttackTarget.position
         else
+            self.bearing.rotation = Quaternion.RotateTowards(self.bearing.rotation, Quaternion.LookRotation(Vector3(self.seat.occupant.facingDirection.x, 0, self.seat.occupant.facingDirection.z), self.bearing.parent.up), self.speed * Time.deltaTime)
+            self.pitch.localEulerAngles = Vector3(Mathf.MoveTowards((self.pitch.localEulerAngles.x + 540) % 360 - 180, Mathf.Clamp(-Mathf.Asin(self.seat.occupant.facingDirection.y) * Mathf.Rad2Deg, self.maxAngle, self.minAngle), Time.deltaTime * self.speed), self.pitch.localEulerAngles.y, self.pitch.localEulerAngles.z)
             return
         end
 
