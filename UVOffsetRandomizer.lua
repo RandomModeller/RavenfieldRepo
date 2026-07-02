@@ -9,6 +9,3 @@ function UVOffsetRandomizer:Start()
 
     self.renderer.material.mainTextureOffset = Vector2(Random.Range(self.offsetMin.x, self.offsetMax.x), Random.Range(self.offsetMin.y, self.offsetMax.y))
 end
-
-function UVOffsetRandomizer:Update()
-end
