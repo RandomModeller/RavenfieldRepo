@@ -1,13 +1,22 @@
-behaviour("SimpleGuidedBombMaster") --v1.1.0
+behaviour("SimpleGuidedBombMaster") --v1.1.2
 
 function SimpleGuidedBombMaster:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
     self.lookAtCCIP = self.targets.lookAtCCIP.GetComponent(ScriptedBehaviour).self
 
-    self.searchRange = self.dataContainer.GetFloat("searchRange")
+    self.searchRange = Mathf.Pow(self.dataContainer.GetFloat("searchRange"), 2)
     self.turnRate = Mathf.Pow(self.dataContainer.GetFloat("turnRate"), 2)
 
-    self.weapon = self.gameObject.GetComponent(Weapon)
+    self.enableFriendlyLock = false
+    if self.dataContainer.HasBool("enableFriendlyLock") then
+        self.enableFriendlyLock = self.dataContainer.GetBool("enableFriendlyLock")
+    end
+
+    if self.targets.weapon then
+        self.weapon = self.targets.weapon.GetComponent(Weapon)
+    else
+        self.weapon = self.gameObject.GetComponent(Weapon)
+    end
     self.weapon.onSpawnProjectiles.AddListener(self, "OnFire")
 
     if self.targets.ring then
@@ -26,17 +35,28 @@ end
 function SimpleGuidedBombMaster:Update()
     self.target = nil
 
-    for i, vehicle in pairs(ActorManager.vehicles) do
-        local sqrDistance = (vehicle.transform.position - self.lookAtCCIP.targetPoint).sqrMagnitude
+    if self.lookAtCCIP then
+        if self.lookAtCCIP.targetPoint then
+            for i, vehicle in pairs(ActorManager.vehicles) do
+                if self.enableFriendlyLock or weapon.killCredit.team ~= self.vehicle.driver.team then
+                    local sqrDistance = (vehicle.transform.position - self.lookAtCCIP.targetPoint)
+                
+                    sqrDistance.y = 0
 
-        if sqrDistance <= self.searchRange then
-            self.target = vehicle
-            break
+                    sqrDistance = sqrDistance.sqrMagnitude
+
+                    if sqrDistance <= self.searchRange then
+                        self.target = vehicle
+                        break
+                    end
+                end
+            end
         end
     end
 
     if self.target then
         self.ring.LookAt(self.target.transform.position, self.transform.up)
+
 
         if self.targets.lookAtCCIPRing then
             self.lookAtCCIPRing.localRotation = self.noTargetRotation
