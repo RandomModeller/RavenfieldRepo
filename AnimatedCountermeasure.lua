@@ -1,4 +1,4 @@
-behaviour("AnimatedCountermeasure") --v1.0.1
+behaviour("AnimatedCountermeasure") --v1.0.2
 
 function AnimatedCountermeasure:Start()
     self.animator = self.targets.animator.GetComponent(Animator)
@@ -21,7 +21,7 @@ end
 function AnimatedCountermeasure:LateUpdate()
     local flag1 = true
     local flag2 = true
-    local flag3 = Input.GetKeybindButtonDown(KeyBinds.Countermeasures)
+    local flag3 = Input.GetKeyBindButtonDown(KeyBinds.Countermeasures)
 
     if self.hands ~= nil then
         if self.seat.occupant ~= nil then
