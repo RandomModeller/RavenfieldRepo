@@ -1,4 +1,4 @@
-behaviour("SAMRadar") --v1.0.1
+behaviour("SAMRadar") --v1.1.0
 
 function SAMRadar:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -30,6 +30,9 @@ function SAMRadar:Start()
     end
     if self.targets.grid then
         self.grid = self.targets.grid.GetComponent(RectTransform)
+    end
+    if self.targets.bearing then
+        self.bearing = self.targets.bearing.transform
     end
 
     self.alignBlipToVelocityVector = false
@@ -159,6 +162,12 @@ function SAMRadar:Update()
 
     self.directionVector = Quaternion.Euler(0, self.rotationSpeed * Time.deltaTime, 0) * self.directionVector
 
+    local matrix = Matrix4x4.zero
+
+    if self.bearing then
+        matrix = self.bearing.worldToLocalMatrix
+    end
+    
     local currentGradient = self.directionVector.z / self.directionVector.x
     if self.elapsed >= self.delay then
         local vehiclePos = self.transform.position
@@ -170,7 +179,13 @@ function SAMRadar:Update()
         end
 
         if self.lockedVehicle then
-            local pos = self:GetBlipPosition(self.lockedVehicle.transform.position, vehiclePos) * self.blipPositionMultiplier
+            local pos = Vector3.zero
+
+            if matrix == Matrix4x4.zero then
+                pos = self:GetBlipPosition(self.lockedVehicle.transform.position, vehiclePos) * self.blipPositionMultiplier
+            else
+                pos = self:GetBlipPosition(matrix.MultiplyPoint3x4(self.lockedVehicle.transform.position), Vector3.zero) * self.blipPositionMultiplier
+            end
 
             if self.grid then
                 self.grid.anchoredPosition = pos
@@ -245,11 +260,18 @@ function SAMRadar:Update()
 
                         local vehiclePos1 = vehicles[i].transform.position
 
-                        local pos = self:GetBlipPosition(vehiclePos1, vehiclePos)
+                        local pos = Vector3.zero
+                        
+                        if matrix == Matrix4x4.zero then
+                            pos = self:GetBlipPosition(vehiclePos1, vehiclePos)
+                        else
+                            pos = self:GetBlipPosition(matrix.MultiplyPoint3x4(vehiclePos1), Vector3.zero)
+                        end
 
                         local flag2 = self:IsInArea(currentGradient, self.lastGradient, pos.x, pos.y)
                         local flag3 = self.doubleDirection or (pos.x * self.directionVector.x >= 0 and pos.y * self.directionVector.z >= 0)
                         local flag4 = pos.sqrMagnitude <= 1
+                        
 
                         if flag2 and flag3 and flag4 then
                             for j, blip in pairs(self.blips) do
@@ -335,7 +357,13 @@ function SAMRadar:Update()
 
                     local missile = self.missileManager.missiles[i]
 
-                    local pos = self:GetBlipPosition(missile.transform.position, vehiclePos)
+                    local pos = Vector3.zero
+                    
+                    if matrix == Matrix4x4.zero then
+                        pos = self:GetBlipPosition(missile.transform.position, vehiclePos)
+                    else
+                        pos = self:GetBlipPosition(matrix.MultiplyPoint3x4(missile.transform.position), Vector3.zero)
+                    end
 
                     self.missileBlips[i].rectTransform.anchoredPosition = pos * self.blipPositionMultiplier
 
@@ -416,7 +444,7 @@ function SAMRadar:GetBlipPosition(pos, selfPos)
 end
 
 function SAMRadar:IsInArea(grad1, grad2, x, y)
-    return (y/x > grad1 and y/x < grad2) or (y/x < grad1 and y/x > grad2)
+    return (y/x > grad1 and y/x < grad2) or (y/x < grad1 and y/x > grad2) or (Mathf.Abs(y/x) > Mathf.Abs(grad1) and Mathf.Abs(y/x) > Mathf.Abs(grad2)) or (Mathf.Abs(y/x) < Mathf.Abs(grad1) and Mathf.Abs(y/x) < Mathf.Abs(grad2))
 end
 
 function SAMRadar:LoadKeybind()
