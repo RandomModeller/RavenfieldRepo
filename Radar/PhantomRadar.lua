@@ -1,4 +1,4 @@
-behaviour("PhantomRadar") --v1.1.0
+behaviour("PhantomRadar") --v1.2.0
 
 function PhantomRadar:Start()
     self.vehicleObject = self.targets.vehicleObject.GetComponent(Vehicle)
@@ -20,6 +20,10 @@ function PhantomRadar:Start()
     self.velocityVectorRotateInSTT = false
     if self.dataContainer.HasBool("velocityVectorRotateInSTT") then
         self.velocityVectorRotateInSTT = self.dataContainer.GetBool("velocityVectorRotateInSTT")
+    end
+    self.ppiDisplay = false
+    if self.dataContainer.HasBool("ppiDisplay") then
+        self.ppiDisplay = self.dataContainer.GetBool("ppiDisplay")
     end
 
     self.currentRange = self.dataContainer.GetFloat("range")
@@ -127,9 +131,13 @@ function PhantomRadar:Update()
 
                 if show then
                     position = matrix.MultiplyPoint3x4(position)
-                    local widthAtRange = position.x * self.azimuthMult
+                    if ppiDisplay then
+                        position = Vector2(position.x, position.z) * self.multiplier
+                    else
+                        local widthAtRange = position.x * self.azimuthMult
 
-                    position = Vector2(widthAtRange, position.z) * self.multiplier
+                        position = Vector2(widthAtRange, position.z) * self.multiplier
+                    end
 
                     if count > #self.blips then
                         self.blips[count] = self:CreateBlip()
@@ -180,37 +188,6 @@ function PhantomRadar:Update()
             end
         end
     end
-
-    -- for i, vehicle in pairs(self.fcr.groundTarget) do
-    --     local position = vehicle.transform.position
-    --     local b = position - self.radarOrigin.position
-
-    --     local show = self:VectorAngleSmaller(self.radarOrigin.forward, b, self.cosRwsAngle)
-
-    --     if show then
-    --         position = matrix.MultiplyPoint3x4(position)
-    --         local widthAtRange = position.x * self.azimuthMult
-
-    --         position = Vector2(widthAtRange, position.z) * self.multiplier
-
-    --         if i > #self.groundBlips then
-    --             self.groundBlips[i] = self:CreateGroundBlip()
-    --             self.groundBlips[i]:Init()
-    --         end
-
-    --         self.groundBlips[i].vehicle = vehicle
-
-    --         if vehicle.driver == nil then
-    --             self.groundBlips[i]:SetColor(self.friendlyColor)
-    --         elseif self.vehicleObject.driver.team == vehicle.driver.team then
-    --             self.groundBlips[i]:SetColor(self.friendlyColor)
-    --         else
-    --             self.groundBlips[i]:SetColor(self.foeColor)
-    --         end
-
-    --         self.groundBlips[i].rectTransform.anchoredPosition = position
-    --     end
-    -- end
 end
 
 function PhantomRadar:VectorAngleSmaller(a, b, cos)
