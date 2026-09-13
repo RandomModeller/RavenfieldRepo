@@ -1,4 +1,4 @@
-behaviour("fireMode") -- v3.0.0
+behaviour("fireMode") -- v3.1.0
 
 function fireMode:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -75,6 +75,11 @@ function fireMode:Start()
 
     if self.selectorValues ~= nil then
         self.animator.SetInteger("FIREMODE_SELECTORVALUES", tonumber(self.selectorValues[(modeIndex % #self.availableModes) + 1]))
+    end
+
+    self.disableWhenReload = false
+    if self.dataContainer.HasBool("FIREMODE_STOP_CHANGE_WHEN_RELOADING") then
+        self.disableWhenReload = self.dataContainer.GetBool("FIREMODE_STOP_CHANGE_WHEN_RELOADING")
     end
 
     -- load keybind
@@ -198,7 +203,7 @@ function fireMode:Update()
         self:onMouseUp()
     end
 
-    if Input.GetKeyDown(self.keybind) then
+    if Input.GetKeyDown(self.keybind) and (not self.disableWhenReload or not self.wpn.isReloading) then
         self:changeFireMode()
     end
 end
