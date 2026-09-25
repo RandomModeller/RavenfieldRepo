@@ -1,4 +1,4 @@
-behaviour("PhantomRadar") --v1.3.0
+behaviour("PhantomRadar") --v1.3.1
 
 function PhantomRadar:Start()
     self.vehicleObject = self.targets.vehicleObject.GetComponent(Vehicle)
@@ -72,6 +72,8 @@ function PhantomRadar:Start()
     self.lastPosition = Vector3.zero
     self.lastRange = 0
     self.targetRange = 0
+    self.targetAspect = 0
+    self.closureSpeed = 0
 end
 
 function PhantomRadar:Update()
