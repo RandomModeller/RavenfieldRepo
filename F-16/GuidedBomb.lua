@@ -1,4 +1,4 @@
-behaviour("GuidedBomb") --v1.1.0
+behaviour("GuidedBomb") --v1.2.0
 
 function GuidedBomb:Init(guidanceTarget, turnRate, isLaserGuided, laserTrackerManager)
     self.projectile = self.gameObject.GetComponent(Projectile)
@@ -13,6 +13,8 @@ function GuidedBomb:Init(guidanceTarget, turnRate, isLaserGuided, laserTrackerMa
     end
 
     self.laserTrackerManager = laserTrackerManager
+    
+    self.delay = 0
 end
 
 function GuidedBomb:Update()
@@ -21,7 +23,7 @@ function GuidedBomb:Update()
     if self.isLaserGuided and self.laserTrackerManager then
         target = self.laserTrackerManager:Get(self.code)
     elseif self.isLaserGuided then
-        target = self.target.transform.position
+        target = self.code.transform.position
     else
         target = self.target
     end
@@ -36,5 +38,13 @@ function GuidedBomb:Update()
         local velocity = self.projectile.velocity.magnitude
 
         self.projectile.velocity = Vector3.RotateTowards(self.projectile.velocity / velocity, (target - self.transform.position).normalized, self.turnRate * Time.deltaTime, 0) * velocity
+    end
+
+    self.delay = self.delay + Time.deltaTime
+
+    if self.delay >= 1 then
+        self.tti = Mathf.Round(Mathf.Sqrt(range/self.projectile.velocity.sqrMagnitude))
+
+        self.delay = self.delay - 1
     end
 end
