@@ -1,4 +1,4 @@
-behaviour("PhantomRadar") --v1.2.0
+behaviour("PhantomRadar") --v1.3.0
 
 function PhantomRadar:Start()
     self.vehicleObject = self.targets.vehicleObject.GetComponent(Vehicle)
@@ -32,6 +32,9 @@ function PhantomRadar:Start()
 
     self.friendlyColor = self.dataContainer.GetColor("friendly")
     self.foeColor = self.dataContainer.GetColor("foe")
+    if self.dataContainer.HasColor("stt") then
+        self.sttColor = self.dataContainer.GetColor("stt")
+    end
 
     self.viewportSize = 100
     self.lockBlipDistance = 49 -- 7^2
@@ -146,13 +149,17 @@ function PhantomRadar:Update()
 
                     self.blips[count].vehicle = vehicle
 
-                    if vehicle.driver == nil then
-                        self.blips[count]:SetColor(self.friendlyColor)
-                    elseif self.vehicleObject.driver.team == vehicle.driver.team then
+                    local friendly = (vehicle.driver == nil) or (self.vehicleObject.driver.team == vehicle.driver.team)
+
+                    if isSTT and self.sttColor then
+                        self.blips[count]:SetColor(self.sttColor)
+                    elseif friendly then
                         self.blips[count]:SetColor(self.friendlyColor)
                     else
                         self.blips[count]:SetColor(self.foeColor)
                     end
+
+                    self.blips[count].friendly = friendly
 
                     self.blips[count]:SetLockSymbol(self.isSTT)
 
