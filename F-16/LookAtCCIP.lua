@@ -1,4 +1,4 @@
-behaviour("LookAtCCIP") --v1.1.1
+behaviour("LookAtCCIP") --v1.1.2
 
 function LookAtCCIP:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -18,6 +18,11 @@ function LookAtCCIP:Start()
         self.lineRange = self.dataContainer.GetFloat("lineRange")
     end
 
+    self.hasMultiSightMode = true
+    if self.dataContainer.HasBool("hasMultiSightMode") then
+        self.hasMultiSightMode = self.dataContainer.GetBool("hasMultiSightMode")
+    end
+
     self.muzzle = self.targets.muzzle.transform
     self.projectileSpeed = self.dataContainer.GetFloat("projectileSpeed")
 
@@ -32,7 +37,7 @@ function LookAtCCIP:Update()
     end
 
     if self.gun then
-        if not (self.gun.activeSightModeIndex == 1) then
+        if not (self.gun.activeSightModeIndex == 1) and self.hasMultiSightMode then
             self.ring.localRotation = Quaternion.identity
             if self.line then
                 self.line.SetPosition(0, self.ring.position + self.ring.forward * self.lineRange)
@@ -46,6 +51,7 @@ function LookAtCCIP:Update()
     if self.skip then
         return
     end
+
 
     if self.fcr then
         if self.fcr.hasTarget then
