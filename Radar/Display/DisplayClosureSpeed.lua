@@ -1,4 +1,4 @@
-behaviour("DisplayClosureSpeed") --v1.0.0
+behaviour("DisplayClosureSpeed") --v1.1.0
 
 function DisplayClosureSpeed:Start()
     self.radar = self.targets.radar.GetComponent(ScriptedBehaviour).self
@@ -8,6 +8,16 @@ function DisplayClosureSpeed:Start()
     self.suffix = ""
     if self.dataContainer.HasString("suffix") then
         self.suffix = self.dataContainer.GetString("suffix")
+    end
+
+    self.hotText = "++"
+    if self.dataContainer.HasString("hotText") then
+        self.hotText = self.dataContainer.GetString("hotText")
+    end
+
+    self.coldText = "--"
+    if self.dataContainer.HasString("coldText") then
+        self.coldText = self.dataContainer.GetString("coldText")
     end
 
     self.displayOnlyWhenLock = false
@@ -20,7 +30,7 @@ end
 
 function DisplayClosureSpeed:Update()
     if (not self.displayOnlyWhenLock) or self.radar.isSTT then
-        self.label.text = (self.radar.closureSpeed > 0 and "++" or "--") .. tostring(Mathf.Round(self.radar.closureSpeed * self.multiplier)) .. self.suffix
+        self.label.text = (self.radar.closureSpeed > 0 and self.hotText or self.coldText) .. tostring(Mathf.Round(self.radar.closureSpeed * self.multiplier)) .. self.suffix
     else
         self.label.text = ""
     end
