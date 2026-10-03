@@ -1,8 +1,9 @@
-behaviour("MeleeProjectile") --v1.0.1
+behaviour("MeleeProjectile") --v1.0.2
 
 function MeleeProjectile:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
     self.weapon = self.targets.weapon.GetComponent(MeleeWeapon)
+    self.weapon.onSpawnProjectiles.AddListener(self, "OnFire")
 
     self.onlyCountHits = self.dataContainer.GetBool("onlyCountHits")
     self.chance = self.dataContainer.GetFloat("chance")
@@ -10,7 +11,7 @@ function MeleeProjectile:Start()
     self.projectile = self.targets.projectile
 end
 
-function MeleeProjectile:Update()
+function MeleeProjectile:OnFire(projectile)
     local valid = true
 
     if self.onlyCountHits then
