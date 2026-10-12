@@ -1,4 +1,4 @@
-behaviour("PhantomRadar") --v1.3.1
+behaviour("PhantomRadar") --v1.3.2
 
 function PhantomRadar:Start()
     self.vehicleObject = self.targets.vehicleObject.GetComponent(Vehicle)
@@ -136,12 +136,9 @@ function PhantomRadar:Update()
 
                 if show then
                     position = matrix.MultiplyPoint3x4(position)
-                    if ppiDisplay then
-                        position = Vector2(position.x, position.z) * self.multiplier
-                    else
-                        local widthAtRange = position.x * self.azimuthMult
-
-                        position = Vector2(widthAtRange, position.z) * self.multiplier
+                    local blipPosition = Vector2(position.x, position.z) * self.multiplier
+                    if not ppiDisplay then
+                        blipPosition.x = blipPosition.x * self.azimuthMult
                     end
 
                     if count > #self.blips then
@@ -164,8 +161,9 @@ function PhantomRadar:Update()
                     self.blips[count].friendly = friendly
 
                     self.blips[count]:SetLockSymbol(self.isSTT)
+                    self.blips[count]:SetSpeed(vehicle.velocity.magnitude)
 
-                    self.blips[count].rectTransform.anchoredPosition = position
+                    self.blips[count].rectTransform.anchoredPosition = blipPosition
 
                     if self.isSTT then
                         local direction = self.radarOrigin.InverseTransformPoint(position)
@@ -174,6 +172,8 @@ function PhantomRadar:Update()
 
                         self.targetRange = b.magnitude
                         self.closureSpeed = (self.lastRange - self.targetRange) / Time.deltaTime
+
+                        self.blips[count]:SetRangeSTT(self.targetRangeself.targetRange)
 
                         self.lastRange = self.targetRange
                     end
