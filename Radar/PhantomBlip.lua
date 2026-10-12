@@ -1,4 +1,4 @@
-behaviour("PhantomBlip") --v1.1.0
+behaviour("PhantomBlip") --v1.1.1
 
 function PhantomBlip:Init()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -54,13 +54,13 @@ function PhantomBlip:SetLockSymbol(value)
     if value ~= self.lockSymbol.activeSelf then
         self.lockSymbol.SetActive(value)
         if value then
-            if (self.friendly or not (self.lockedEnemySprite)) and self.lockedSprite
+            if (self.friendly or not (self.lockedEnemySprite)) and self.lockedSprite then
                 self.symbol.sprite = self.lockedSprite
             elseif not self.friendly and self.lockedEnemySprite then
                 self.symbol.sprite = self.lockedEnemySprite
             end
         else
-            if (self.friendly or not (self.enemySprite)) and self.normalSprite
+            if (self.friendly or not (self.enemySprite)) and self.normalSprite then
                 self.symbol.sprite = self.normalSprite
             elseif not self.friendly and self.enemySprite then
                 self.symbol.sprite = self.enemySprite
