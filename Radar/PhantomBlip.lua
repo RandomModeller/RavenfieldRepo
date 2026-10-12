@@ -1,4 +1,4 @@
-behaviour("PhantomBlip") --v1.1.1
+behaviour("PhantomBlip") --v1.2.0
 
 function PhantomBlip:Init()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -34,6 +34,18 @@ function PhantomBlip:Init()
     if self.dataContainer.HasBool("stabilizeLockSymbol") then
         self.stabilizeLockSymbol = self.dataContainer.GetBool("stabilizeLockSymbol")
     end
+
+    self.rangeTextSTT = nil
+    if self.targets.rangeTextSTT then
+        self.rangeTextSTT = self.targets.rangeTextSTT.GetComponent(Text)
+        self.rangeTextSTTMultiplier = self.dataContainer.GetFloat("rangeTextSTTMultiplier")
+    end
+
+    self.speedText = nil
+    if self.targets.speedText then
+        self.speedText = self.targets.speedText.GetComponent(Text)
+        self.speedTextMultiplier = self.dataContainer.GetFloat("speedTextMultiplier")
+    end
 end
 
 function PhantomBlip:Update()
@@ -66,5 +78,17 @@ function PhantomBlip:SetLockSymbol(value)
                 self.symbol.sprite = self.enemySprite
             end
         end
+    end
+end
+
+function PhantomBlip:SetSpeed(value)
+    if self.speedText then
+        self.speedText.text = tostring(Mathf.Round(value * self.speedTextMultiplier))
+    end
+end
+
+function PhantomBlip:SetRangeSTT(value)
+    if self.rangeTextSTT then
+        self.rangeTextSTT.text = tostring(Mathf.Round(value * self.rangeTextSTTMultiplier))
     end
 end
