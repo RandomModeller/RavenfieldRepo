@@ -1,11 +1,11 @@
-behaviour("DoubleReload") --v1.0.0
+behaviour("DoubleReload") --v1.0.1
 
 function DoubleReload:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
     self.weapon = self.targets.weapon.GetComponent(Weapon)
     self.weapon.onSpawnProjectiles.AddListener(self, "onFire")
 
-    self.barrelCount = self.dataContainer.GetFloat("barrelCount")
+    self.barrelCount = self.dataContainer.GetInt("barrelCount")
     self.reloadDuration = self.dataContainer.GetFloat("reloadDuration")
 
     self.reloadEnd = {}
