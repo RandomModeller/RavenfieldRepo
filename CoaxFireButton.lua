@@ -1,9 +1,8 @@
-behaviour("CoaxFireButton") --v1.2.3
+behaviour("CoaxFireButton") --v1.3.0
 
 function CoaxFireButton:Start()
     self.coax = self.targets.coax.GetComponent(Weapon)
 
-    --self.vehicle = self.targets.vehicleObject.GetComponent(Vehicle)
     self.audio = self.targets.coax.GetComponent(AudioSource)
     self.seat = self.targets.seatTarget.GetComponent(Seat)
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -32,5 +31,9 @@ function CoaxFireButton:LateUpdate()
         if not Input.GetKey(self.keybind) then
             self.audio.Stop()
         end
+    end
+
+    if self.coax.ammo == 0 then
+        self.coax:Reload()
     end
 end
