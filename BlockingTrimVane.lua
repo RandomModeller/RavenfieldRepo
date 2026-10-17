@@ -1,10 +1,10 @@
-behaviour("BlockingTrimVane") --v1.0.0
+behaviour("BlockingTrimVane") --v1.0.1
 
 function BlockingTrimVane:Start()
     self.vehicle = self.targets.vehicleObject.GetComponent(Vehicle)
+    self.dataContainer = self.gameObject.GetComponent(DataContainer)
     self.bearing = self.targets.bearing.transform
     self.pitch = self.targets.pitch.transform
-    -- self.fakeBearing = self.targets.fakeBearing.transform
     self.fakePitch = self.targets.fakePitch.transform
 
     self.bearingMin = self.dataContainer.GetFloat("bearingMin")
