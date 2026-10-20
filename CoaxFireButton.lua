@@ -1,4 +1,4 @@
-behaviour("CoaxFireButton") --v1.3.1
+behaviour("CoaxFireButton") --v1.3.2
 
 function CoaxFireButton:Start()
     self.coax = self.targets.coax.GetComponent(Weapon)
@@ -10,7 +10,7 @@ function CoaxFireButton:Start()
 end
 
 function CoaxFireButton:LateUpdate()
-    if not self.coax.isPlayer then
+    if not self.coax.user.isPlayer then
         return
     end
 
