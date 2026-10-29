@@ -1,4 +1,4 @@
-behaviour("PhantomRadar") --v1.3.2
+behaviour("PhantomRadar") --v1.3.3
 
 function PhantomRadar:Start()
     self.vehicleObject = self.targets.vehicleObject.GetComponent(Vehicle)
@@ -20,6 +20,10 @@ function PhantomRadar:Start()
     self.velocityVectorRotateInSTT = false
     if self.dataContainer.HasBool("velocityVectorRotateInSTT") then
         self.velocityVectorRotateInSTT = self.dataContainer.GetBool("velocityVectorRotateInSTT")
+    end
+    self.symbolFaceClosureSpeed = false
+    if self.dataContainer.HasBool("symbolFaceClosureSpeed") then
+        self.symbolFaceClosureSpeed = self.dataContainer.GetBool("symbolFaceClosureSpeed")
     end
     self.ppiDisplay = false
     if self.dataContainer.HasBool("ppiDisplay") then
@@ -44,10 +48,7 @@ function PhantomRadar:Start()
     self.blips = {}
     self.blips[1] = self:CreateBlip()
     self.blips[1]:Init()
-    -- self.groundBlipPrefab = self.targets.groundBlipPrefab
-    -- self.groundBlips = {}
-    -- self.groundBlips[1] = self:CreateGroundBlip()
-    -- self.groundBlips[1]:Init()
+
     self.maxBlip = 999
     if self.dataContainer.HasFloat("maxBlip") then
         self.maxBlip = self.dataContainer.GetFloat("maxBlip")
@@ -58,11 +59,13 @@ function PhantomRadar:Start()
     self.rangesMult = self.viewportSize / self.currentRange
     self.azimuthMult = 1 / Mathf.Tan(Mathf.Deg2Rad * self.currentAzimuth)
 
-    self.targetTrackerTransform = self.targets.targetTrackerTransform.transform
-    self.lastTargetTrackerPosition = Vector3.zero
+    if self.targets.targetTrackerTransform then
+        self.targetTrackerTransform = self.targets.targetTrackerTransform.transform
+        self.lastTargetTrackerPosition = Vector3.zero
 
-    if self.targetTrackerTransform ~= nil then
-        self.lastTargetTrackerPosition = self.targetTrackerTransform.localPosition
+        if self.targetTrackerTransform ~= nil then
+            self.lastTargetTrackerPosition = self.targetTrackerTransform.localPosition
+        end
     end
 
     self.activateOnSTT = self.targets.activateOnSTT
@@ -72,8 +75,11 @@ function PhantomRadar:Start()
     self.lastPosition = Vector3.zero
     self.lastRange = 0
     self.targetRange = 0
+    self.targetAltitude = 0
+    self.targetSpeed = 0
     self.targetAspect = 0
     self.closureSpeed = 0
+    self.targetBlipPosition = Vector2(0, 0)
 end
 
 function PhantomRadar:Update()
@@ -116,6 +122,8 @@ function PhantomRadar:Update()
 
     local count = 1
 
+    local selfVelocity = matrix.MultiplyPoint3x4(self.vehicleRigidbody.velocity + self.radarOrigin.position)
+
     for i, vehicle in pairs(targetPool) do
         if vehicle.spotChanceMultiplier > 0 and vehicle.driver ~= nil then
             local calculate = true
@@ -127,7 +135,6 @@ function PhantomRadar:Update()
             end
 
             calculate = calculate and count <= self.maxBlip
-
             if calculate then
                 local position = vehicle.transform.position
                 local b = position - self.radarOrigin.position
@@ -140,6 +147,15 @@ function PhantomRadar:Update()
                     if not ppiDisplay then
                         blipPosition.x = blipPosition.x * self.azimuthMult
                     end
+
+                    local relativeVelocity = Vector3.zero
+
+                    if vehicle.rigidbody ~= nil then
+                        relativeVelocity = matrix.MultiplyPoint3x4(vehicle.rigidbody.velocity + self.radarOrigin.position)
+                    end
+
+                    local closureSpeed = selfVelocity.z - relativeVelocity.z
+                    local speed = vehicle.rigidbody.velocity.magnitude
 
                     if count > #self.blips then
                         self.blips[count] = self:CreateBlip()
@@ -159,9 +175,10 @@ function PhantomRadar:Update()
                     end
 
                     self.blips[count].friendly = friendly
-
                     self.blips[count]:SetLockSymbol(self.isSTT)
-                    self.blips[count]:SetSpeed(vehicle.velocity.magnitude)
+                    self.blips[count]:SetSpeed(speed)
+                    self.blips[count]:SetClosureSpeed(closureSpeed)
+                    self.blips[count]:SetAltitude(vehicle.transform.position.y)
 
                     self.blips[count].rectTransform.anchoredPosition = blipPosition
 
@@ -171,26 +188,34 @@ function PhantomRadar:Update()
                         self.targetAspect = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg
 
                         self.targetRange = b.magnitude
-                        self.closureSpeed = (self.lastRange - self.targetRange) / Time.deltaTime
+                        self.targetAltitude = vehicle.transform.position.y
+                        self.targetSpeed = speed
+                        self.closureSpeed = closureSpeed
+                        self.targetBlipPosition = blipPosition
 
-                        self.blips[count]:SetRangeSTT(self.targetRangeself.targetRange)
+                        self.blips[count]:SetRangeSTT(self.targetRange)
 
                         self.lastRange = self.targetRange
+                    else
+                        self.targetAspect = 0
+                        self.targetAltitude = 0
+                        self.targetSpeed = 0
+                        self.closureSpeed = 0
+                        self.blips[count]:ClearRangeSTT()
                     end
 
                     if (self.isSTT and self.velocityVectorRotateInSTT) or (not self.isSTT and self.velocityVectorRotateInTWS) then
-                        local relativeVelocity = Vector3.zero
                         local heading = 0
-
-                        if vehicle.rigidbody ~= nil then
-                            relativeVelocity = matrix.MultiplyPoint3x4(vehicle.rigidbody.velocity + self.radarOrigin.position)
-                            heading = Mathf.Atan2(relativeVelocity.x, relativeVelocity.z) * Mathf.Rad2Deg
-                        end
+                        heading = Mathf.Atan2(relativeVelocity.x, relativeVelocity.z) * Mathf.Rad2Deg
 
                         self.blips[count].rectTransform.localEulerAngles = Vector3(0, 0, -heading)
                     else
                         self.blips[count].rectTransform.localEulerAngles = Vector3.zero
                     end
+
+                   if self.symbolFaceClosureSpeed then
+                        self.blips[count].symbol.rectTransform.localEulerAngles = Vector3.forward * (closureSpeed > 0 and 180 or 0)
+                   end
 
                     count = count + 1
                 end
