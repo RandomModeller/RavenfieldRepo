@@ -1,4 +1,4 @@
-behaviour("PhantomBlip") --v1.2.0
+behaviour("PhantomBlip") --v1.3.0
 
 function PhantomBlip:Init()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -46,6 +46,18 @@ function PhantomBlip:Init()
         self.speedText = self.targets.speedText.GetComponent(Text)
         self.speedTextMultiplier = self.dataContainer.GetFloat("speedTextMultiplier")
     end
+
+    self.closureSpeedText = nil
+    if self.targets.closureSpeedText then
+        self.closureSpeedText = self.targets.closureSpeedText.GetComponent(Text)
+        self.closureSpeedTextMultiplier = self.dataContainer.GetFloat("closureSpeedTextMultiplier")
+    end
+
+    self.altitudeText = nil
+    if self.targets.altitudeText then
+        self.altitudeText = self.targets.altitudeText.GetComponent(Text)
+        self.altitudeTextMultiplier = self.dataContainer.GetFloat("altitudeTextMultiplier")
+    end
 end
 
 function PhantomBlip:Update()
@@ -87,8 +99,24 @@ function PhantomBlip:SetSpeed(value)
     end
 end
 
+function PhantomBlip:SetClosureSpeed(value)
+    if self.closureSpeedText then
+        self.closureSpeedText.text = tostring(Mathf.Round(value * self.closureSpeedTextMultiplier))
+    end
+end
+
+function PhantomBlip:SetAltitude(value)
+    if self.altitudeText then
+        self.altitudeText.text = tostring(Mathf.Round(value * self.altitudeTextMultiplier))
+    end
+end
+
 function PhantomBlip:SetRangeSTT(value)
     if self.rangeTextSTT then
         self.rangeTextSTT.text = tostring(Mathf.Round(value * self.rangeTextSTTMultiplier))
     end
+end
+
+function PhantomBlip:ClearRangeSTT(value)
+    self.rangeTextSTT.text = ""
 end
