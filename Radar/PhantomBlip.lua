@@ -1,4 +1,4 @@
-behaviour("PhantomBlip") --v1.3.0
+behaviour("PhantomBlip") --v1.3.1
 
 function PhantomBlip:Init()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -118,5 +118,7 @@ function PhantomBlip:SetRangeSTT(value)
 end
 
 function PhantomBlip:ClearRangeSTT(value)
-    self.rangeTextSTT.text = ""
+    if self.rangeTextSTT then
+        self.rangeTextSTT.text = ""
+    end
 end
