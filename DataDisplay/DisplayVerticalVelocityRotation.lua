@@ -1,10 +1,10 @@
-behaviour("DisplayVerticalVelocityRotation") --v1.0.0
+behaviour("DisplayVerticalVelocityRotation") --v1.0.1
 
 function DisplayVerticalVelocityRotation:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
 
     self.avionics = self.targets.avionics.GetComponent(ScriptedBehaviour).self
-    self.transform = self.targets.background.GetComponent(RectTransform)
+    self.transform = self.gameObject.transform
 
     self.multiplier = self.dataContainer.GetFloat("multiplier")
     self.vector = self.dataContainer.GetVector("rotation")
