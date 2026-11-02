@@ -1,4 +1,4 @@
-behaviour("DisplayVerticalVelocityRotation") --v1.0.1
+behaviour("DisplayVerticalVelocityRotation") --v1.0.2
 
 function DisplayVerticalVelocityRotation:Start()
     self.dataContainer = self.gameObject.GetComponent(DataContainer)
@@ -17,5 +17,5 @@ function DisplayVerticalVelocityRotation:Start()
 end
 
 function DisplayVerticalVelocityRotation:Update()
-    self.transform.localEulerAngles = self.vector * Mathf.Clamp(self.avionics.gForce * self.multiplier + self.offset, self.min, self.max)
+    self.transform.localEulerAngles = self.vector * Mathf.Clamp(self.avionics.gForce * self.multiplier, self.min, self.max) + self.offset
 end
